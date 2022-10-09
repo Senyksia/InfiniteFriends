@@ -1,17 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <RootNamespace>InfiniteFriends</RootNamespace>
+    <AssemblyName>InfiniteFriends</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <RestoreAdditionalProjectSources>
-      https://api.nuget.org/v3/index.json;
-      https://nuget.bepinex.dev/v3/index.json
-    </RestoreAdditionalProjectSources>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="MyScriptAssembly">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\MyScriptAssembly.dll</HintPath>
-    </Reference>
     <Reference Include="MyScriptAssembly">
       <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\MyScriptAssembly.dll</HintPath>
     </Reference>
@@ -33,7 +28,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <Reference Include="0Harmony.dll">
+      <HintPath>..\Assemblies\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Core">
+      <HintPath>..\Assemblies\BepInEx.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Unity">
+      <HintPath>..\Assemblies\BepInEx.Unity.dll</HintPath>
+    </Reference>
   </ItemGroup>
+
+  <Target Name="Copy" AfterTargets="Build" Condition="'$(GameFolder)' != ''">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameFolder)\BepInEx\plugins\" UseSymboliclinksIfPossible="true" />
+  </Target>
 
 </Project>
