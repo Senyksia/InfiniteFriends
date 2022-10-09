@@ -1,0 +1,53 @@
+# Draft a release with notes from CHANGELOG.md, and bump project version numbers.
+name: Draft Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version number (e.g. 1.0.0)"
+        required: true
+        type: string
+
+jobs:    
+  Release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Extract release notes
+      id: extract_release_notes
+      uses: ffurrer2/extract-release-notes@v1
+      with:
+        prerelease: true
+
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        artifactErrorsFailBuild: true
+        body: ${{ steps.extract_release_notes.outputs.release_notes }}
+        tag: v${{ inputs.version }}
+        draft: true
+
+    - name: Update CHANGELOG.md
+      uses: thomaseizinger/keep-a-changelog-new-release@v1
+      with:
+        version: ${{ inputs.version }}
+
+    - name: Bump plugin version
+      run: sed -i -r "s/[0-9]+\.[0-9]+\.[0-9]+/${{ inputs.version }}/" InfiniteFriends/PluginInfo.cs
+
+    - name: Initialize mandatory git config
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email noreply@github.com
+
+    - name: Commit and push
+      run: |
+        git add CHANGELOG.md InfiniteFriends/PluginInfo.cs
+        git commit -m "chore: v${{ inputs.version }}"
+        git push origin main
