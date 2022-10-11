@@ -55,47 +55,106 @@ namespace InfiniteFriends.Patches
 
             // Init
             Transform[] spawns = new Transform[Math.Max(4, __instance.spawnedPlayers.Count)];
-            GameObject gameObject = GameObject.Find("SpawnPoints");
+            GameObject spawnPoints = GameObject.Find("SpawnPoints");
+            bool airborne = true; // Are all default spawns airborne?
 
-            if (!gameObject)
+            if (!spawnPoints)
             {
                 __result = spawns;
                 return false;
             }
-            Transform defaultSpawns = gameObject.transform;
+            Transform defaultSpawns = spawnPoints.transform;
 
-            // Insert default spawns
+            // Get all platform colliders
+            Collider2D[] colliders = GameObject.FindObjectsOfType<Collider2D>();
+            List<Collider2D> platforms = new List<Collider2D>();
+            string[] platformNames = new string[] { "Base", "Box", "Floor", "Platform", "WorldShape" };
+
+            foreach (Collider2D col in colliders)
+            {
+                if (platformNames.Any(name => col.name.StartsWith(name)))
+                {
+                    platforms.Add(col);
+                }
+            }
+
+            // Insert default spawns, and determine if any are attached to a platform
             for (int i = 0; i < defaultSpawns.childCount; i++)
             {
                 spawns[i] = defaultSpawns.GetChild(i);
-            }
-
-            // Find the minimum distance between any two default spawns
-            float minDist = float.PositiveInfinity;
-            for (int i = 0; i < defaultSpawns.childCount; i++)
-            {
-                for (int j = i+1; j < defaultSpawns.childCount; j++)
+                foreach (Collider2D platform in platforms)
                 {
-                    float dist = Vector3.Distance(spawns[i].position, spawns[j].position);
-                    if (dist < minDist) minDist = dist;
+                    Vector2 point = platform.ClosestPoint(spawns[i].position);
+                    if (Vector2.Distance(point, spawns[i].position) < 50f) // 50f is the wall magnet distance
+                    {
+                        platforms.Remove(platform);
+                        platforms.Insert(0, platform);
+                        airborne = false;
+                        break;
+                    }
                 }
             }
 
             // Generate new spawns to match player count
-            for (int i = defaultSpawns.childCount; i < __instance.spawnedPlayers.Count; i++)
+            if (airborne)
             {
-                Transform spawn = new GameObject().transform;
-                spawn.gameObject.name = (i+1).ToString();
-
-                // Search for legal spawn locations around a random prior spawn
-                Vector2 initial = spawns[UnityEngine.Random.Range(0, i-1)].position;
-                do
+                // Find the minimum distance between any two default spawns
+                float minDist = float.PositiveInfinity;
+                for (int i = 0; i < defaultSpawns.childCount; i++)
                 {
-                    spawn.position = initial + UnityEngine.Random.insideUnitCircle.normalized * minDist;
+                    for (int j = i+1; j < defaultSpawns.childCount; j++)
+                    {
+                        float dist = Vector3.Distance(spawns[i].position, spawns[j].position);
+                        if (dist < minDist) minDist = dist;
+                    }
                 }
-                while (!IsLegalSpawn(spawn.position));
 
-                spawns[i] = spawn;
+                // Generate spawns
+                for (int i = defaultSpawns.childCount; i < __instance.spawnedPlayers.Count; i++)
+                {
+                    // Initialise a new spawn point
+                    Transform spawn = new GameObject().transform;
+                    spawn.gameObject.name = (i+1).ToString();
+
+                    // Search for legal spawn locations around a random prior spawn
+                    Vector2 initial = spawns[UnityEngine.Random.Range(0, i-1)].position;
+                    do
+                    {
+                        spawn.position = initial + UnityEngine.Random.insideUnitCircle.normalized * minDist;
+                    }
+                    while (!IsLegalSpawn(spawn.position));
+
+                    spawns[i] = spawn;
+                }
+            }
+            else
+            {
+                // Generate spawns
+                for (int i = defaultSpawns.childCount; i < __instance.spawnedPlayers.Count; i++)
+                {
+                    // Initialise a new spawn point
+                    Transform spawn = new GameObject().transform;
+                    spawn.gameObject.name = (i+1).ToString();
+
+                    // Choose a random legal spawn on the edge of a platform
+                    // Equally distributes the players among available platforms
+                    Collider2D platform = platforms[i%platforms.Count];
+                    Bounds bounds = platform.bounds;
+                    do
+                    {
+                        // Choose a random point inside the platform
+                        Vector2 point = new Vector2(
+                            UnityEngine.Random.Range(bounds.min.x, bounds.max.x),
+                            UnityEngine.Random.Range(bounds.min.y, bounds.max.y));
+
+                        // Magnetise to a point slightly outside the platform edge, to prevent clipping
+                        spawn.position = platform.ClosestPoint(point);
+                        spawn.position += (Vector3)((Vector2)spawn.position - (Vector2)bounds.center).normalized * 10f;
+                    }
+                    while (!IsLegalSpawn(spawn.position));
+
+                    spawns[i] = spawn;
+                }
             }
 
             __result = spawns;
