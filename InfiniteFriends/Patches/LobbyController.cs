@@ -37,9 +37,38 @@ namespace InfiniteFriends.Patches
         }
     }
 
+    // A Collider2D wrapper that holds spawning information
+    public class SpawnPlatform : IComparable<SpawnPlatform>
+    {
+        public Collider2D collider;
+        public readonly float area;
+        public int spawnCount = 0;
+        public float weight
+        {
+            get { return this.area / (2*this.spawnCount + 1); }
+        }
+
+        public SpawnPlatform(Collider2D collider)
+        {
+            this.collider = collider;
+            this.area = collider.bounds.size.x * collider.bounds.size.y;
+        }
+
+        public int CompareTo(SpawnPlatform other)
+        {
+            if (other != null)
+            {
+                if (this.weight > other.weight) return 1;
+                if (this.weight < other.weight) return -1;
+                return 0;
+            }
+            return 1;
+        }
+    }
 
     // Rewrite the GetSpawnPoints() logic for more than 4 players
-    // TODO: Choose fairer locations (not above/near lava, not next to another player)
+    // TODO: Choose fairer locations (not near lava, not next to another player)
+    // TODO: Move spawn generation out of GetSpawnPoints, to prevent unnecessary calls
     [HarmonyPatch(typeof(LobbyController), nameof(LobbyController.GetSpawnPoints))]
     class LobbyController_Patch_GetSpawnPoints
     {
@@ -67,14 +96,14 @@ namespace InfiniteFriends.Patches
 
             // Get all platform colliders
             Collider2D[] colliders = GameObject.FindObjectsOfType<Collider2D>();
-            List<Collider2D> platforms = new List<Collider2D>();
+            List<SpawnPlatform> platforms = new List<SpawnPlatform>();
             string[] platformNames = new string[] { "Base", "Box", "Floor", "Platform", "WorldShape" };
 
             foreach (Collider2D col in colliders)
             {
                 if (platformNames.Any(name => col.name.StartsWith(name)))
                 {
-                    platforms.Add(col);
+                    platforms.Add(new SpawnPlatform(col));
                 }
             }
 
@@ -82,13 +111,12 @@ namespace InfiniteFriends.Patches
             for (int i = 0; i < defaultSpawns.childCount; i++)
             {
                 spawns[i] = defaultSpawns.GetChild(i);
-                foreach (Collider2D platform in platforms)
+                foreach (SpawnPlatform platform in platforms)
                 {
-                    Vector2 point = platform.ClosestPoint(spawns[i].position);
+                    Vector2 point = platform.collider.ClosestPoint(spawns[i].position);
                     if (Vector2.Distance(point, spawns[i].position) < 50f) // 50f is the wall magnet distance
                     {
-                        platforms.Remove(platform);
-                        platforms.Insert(0, platform);
+                        platform.spawnCount++;
                         airborne = false;
                         break;
                     }
@@ -105,7 +133,7 @@ namespace InfiniteFriends.Patches
                     for (int j = i+1; j < defaultSpawns.childCount; j++)
                     {
                         float dist = Vector3.Distance(spawns[i].position, spawns[j].position);
-                        if (dist < minDist) minDist = dist;
+                        minDist = Math.Min(minDist, dist);
                     }
                 }
 
@@ -137,9 +165,32 @@ namespace InfiniteFriends.Patches
                     spawn.gameObject.name = (i+1).ToString();
 
                     // Choose a random legal spawn on the edge of a platform
-                    // Equally distributes the players among available platforms
-                    Collider2D platform = platforms[i%platforms.Count];
-                    Bounds bounds = platform.bounds;
+                    // Distributes the players among available platforms, weighted based on platform bounded area
+                    // TODO: Weight based on perimeter, rather than area
+
+                    // Ordered list of weights
+                    platforms.Sort();
+                    List<float> weights = (from p in platforms select p.weight).ToList();
+
+                    // Cumulatively sum weights
+                    for (int j = 1; j < weights.Count; j++)
+                    {
+                        weights[j] += weights[j-1];
+                    }
+
+                    // Normalise weights
+                    for (int j = 0; j < weights.Count; j++)
+                    {
+                        weights[j] /= weights.Last();
+                    }
+
+                    // Pull a random float, and determine which weight region it falls under
+                    float rand = UnityEngine.Random.value;
+                    int index = 0;
+                    while (rand > weights[index]) index++;
+                    SpawnPlatform platform = platforms[index];
+
+                    Bounds bounds = platform.collider.bounds;
                     do
                     {
                         // Choose a random point inside the platform
@@ -148,11 +199,12 @@ namespace InfiniteFriends.Patches
                             UnityEngine.Random.Range(bounds.min.y, bounds.max.y));
 
                         // Magnetise to a point slightly outside the platform edge, to prevent clipping
-                        spawn.position = platform.ClosestPoint(point);
+                        spawn.position = collider.ClosestPoint(point);
                         spawn.position += (Vector3)((Vector2)spawn.position - (Vector2)bounds.center).normalized * 10f;
                     }
                     while (!IsLegalSpawn(spawn.position));
 
+                    platform.spawnCount++;
                     spawns[i] = spawn;
                 }
             }
