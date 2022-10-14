@@ -208,17 +208,15 @@ namespace InfiniteFriends.Patches
                     while (rand > weights[index]) index++;
                     SpawnPlatform platform = platforms[index];
 
-                    Bounds bounds = platform.collider.bounds;
                     do
                     {
-                        // Choose a random point inside the platform
+                        // Choose a random point inbounds
                         Vector2 point = new Vector2(
-                            UnityEngine.Random.Range(bounds.min.x, bounds.max.x),
-                            UnityEngine.Random.Range(bounds.min.y, bounds.max.y));
+                            UnityEngine.Random.Range(inbounds.min.x, inbounds.max.x),
+                            UnityEngine.Random.Range(inbounds.min.y, inbounds.max.y));
 
-                        // Magnetise to a point slightly outside the platform edge, to prevent clipping
-                        spawn.position = collider.ClosestPoint(point);
-                        spawn.position += (Vector3)((Vector2)spawn.position - (Vector2)bounds.center).normalized * 10f;
+                        // Magnetise to the platform perimeter
+                        spawn.position = platform.collider.ClosestPoint(point);
                     }
                     while (!IsLegalSpawn(spawn.position));
 
