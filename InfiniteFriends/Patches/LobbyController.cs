@@ -41,6 +41,7 @@ namespace InfiniteFriends.Patches
     public class SpawnPlatform : IComparable<SpawnPlatform>
     {
         public Collider2D collider;
+        public Bounds bounds;
         public readonly float area;
         public int spawnCount = 0;
         public float weight
@@ -48,10 +49,21 @@ namespace InfiniteFriends.Patches
             get { return this.area / (2*this.spawnCount + 1); }
         }
 
-        public SpawnPlatform(Collider2D collider)
+        public SpawnPlatform(Collider2D collider, Bounds inbounds)
         {
             this.collider = collider;
-            this.area = collider.bounds.size.x * collider.bounds.size.y;
+
+            this.bounds = new Bounds(collider.bounds.center, collider.bounds.size);
+            this.bounds.min = new Vector3(
+                Math.Max(this.bounds.min.x, inbounds.min.x),
+                Math.Max(this.bounds.min.y, inbounds.min.y),
+                0);
+            this.bounds.max = new Vector3(
+                Math.Min(this.bounds.max.x, inbounds.max.x),
+                Math.Min(this.bounds.max.y, inbounds.max.y),
+                0);
+
+            this.area = this.bounds.size.x * this.bounds.size.y;
         }
 
         public int CompareTo(SpawnPlatform other)
@@ -99,11 +111,17 @@ namespace InfiniteFriends.Patches
             List<SpawnPlatform> platforms = new List<SpawnPlatform>();
             string[] platformNames = new string[] { "Base", "Box", "Floor", "Platform", "WorldShape" };
 
-            foreach (Collider2D col in colliders)
+            // Get approximate level bounds
+            Collider2D confiner = (from c in colliders where c.name == "Confiner" select c).First();
+            Bounds inbounds = new Bounds(confiner.bounds.center, confiner.bounds.size + new Vector3(200f, 200f, 0.2f));
+
+            foreach (Collider2D collider in colliders)
             {
-                if (platformNames.Any(name => col.name.StartsWith(name)))
+                // Is a type of platform AND inbounds
+                if (platformNames.Any(name => collider.name.StartsWith(name))
+                 && inbounds.Intersects(collider.bounds))
                 {
-                    platforms.Add(new SpawnPlatform(col));
+                    platforms.Add(new SpawnPlatform(collider, inbounds));
                 }
             }
 
