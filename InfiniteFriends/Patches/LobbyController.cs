@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace InfiniteFriends.Patches
 {
@@ -79,7 +80,7 @@ namespace InfiniteFriends.Patches
     }
 
     // Rewrite the GetSpawnPoints() logic for more than 4 players
-    // TODO: Choose fairer locations (not near lava, not next to another player)
+    // TODO: Choose fairer locations (not next to another player)
     // TODO: Move spawn generation out of GetSpawnPoints, to prevent unnecessary calls
     [HarmonyPatch(typeof(LobbyController), nameof(LobbyController.GetSpawnPoints))]
     class LobbyController_Patch_GetSpawnPoints
@@ -90,8 +91,14 @@ namespace InfiniteFriends.Patches
             // Check if the player would be spawned in a wall/lava
             static bool IsLegalSpawn(Vector3 pos)
             {
-                RaycastHit2D raycastHit2D = Physics2D.Raycast(pos, Vector2.up, 0.01f, GameController.instance.worldLayers);
-                return (!raycastHit2D.collider);
+                RaycastHit2D worldRaycast = Physics2D.Raycast(pos, Vector2.up, 0.01f, GameController.instance.worldLayers);
+
+                bool old = Physics2D.queriesHitTriggers; // Just Physics2D things
+                Physics2D.queriesHitTriggers = true;
+                Collider2D deathZone = Physics2D.OverlapCircle(pos, 15f, LayerMask.GetMask("Hazard"));
+                Physics2D.queriesHitTriggers = old;
+
+                return (!worldRaycast.collider && !deathZone);
             }
 
             // Init
