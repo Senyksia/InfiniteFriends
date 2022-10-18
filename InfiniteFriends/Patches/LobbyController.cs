@@ -88,6 +88,34 @@ namespace InfiniteFriends.Patches
         [HarmonyPrefix]
         static bool Prefix(LobbyController __instance, ref Transform[] __result)
         {
+            // Choose a random legal spawn on the edge of a platform
+            // Distributes the players among available platforms, weighted based on platform bounded area
+            // TODO: Weight based on perimeter, rather than area
+            static int ChoosePlatform(ref List<SpawnPlatform> platforms)
+            {
+                // Ordered list of weights
+                platforms.Sort();
+                List<float> weights = (from p in platforms select p.weight).ToList();
+
+                // Cumulatively sum weights
+                for (int i = 1; i < weights.Count; i++)
+                {
+                    weights[i] += weights[i-1];
+                }
+
+                // Normalise weights
+                for (int i = 0; i < weights.Count; i++)
+                {
+                    weights[i] /= weights.Last();
+                }
+
+                // Pull a random float, and determine which weight region it falls under
+                float rand = UnityEngine.Random.value;
+                int index = 0;
+                while (rand > weights[index]) index++;
+                return index;
+            }
+
             // Check if the player would be spawned in a wall/lava
             static bool IsLegalSpawn(Vector3 pos)
             {
@@ -189,34 +217,21 @@ namespace InfiniteFriends.Patches
                     Transform spawn = new GameObject().transform;
                     spawn.gameObject.name = (i+1).ToString();
 
-                    // Choose a random legal spawn on the edge of a platform
-                    // Distributes the players among available platforms, weighted based on platform bounded area
-                    // TODO: Weight based on perimeter, rather than area
-
-                    // Ordered list of weights
-                    platforms.Sort();
-                    List<float> weights = (from p in platforms select p.weight).ToList();
-
-                    // Cumulatively sum weights
-                    for (int j = 1; j < weights.Count; j++)
-                    {
-                        weights[j] += weights[j-1];
-                    }
-
-                    // Normalise weights
-                    for (int j = 0; j < weights.Count; j++)
-                    {
-                        weights[j] /= weights.Last();
-                    }
-
-                    // Pull a random float, and determine which weight region it falls under
-                    float rand = UnityEngine.Random.value;
-                    int index = 0;
-                    while (rand > weights[index]) index++;
+                    int index = ChoosePlatform(ref platforms);
                     SpawnPlatform platform = platforms[index];
 
+                    int attempts = 0;
                     do
                     {
+                        if (++attempts > 25)
+                    {
+                            PatchLogger.LogWarning($"Spawn platform '{platform.collider.name}' exceeded maximum spawning attempts ({attempts+1}), removing from spawning pool.");
+                            platforms.RemoveAt(index);
+                            index = ChoosePlatform(ref platforms);
+                            platform = platforms[index];
+                            attempts = 1;
+                    }
+
                         // Choose a random point inbounds
                         Vector2 point = new Vector2(
                             UnityEngine.Random.Range(inbounds.min.x, inbounds.max.x),
