@@ -3,6 +3,9 @@
 Based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)!
 
 ## [Unreleased]
+### Added
+ - Improved the spawn point generation logic.
+ - Spawns are now distributed among platforms, prioritising those with a greater area and fewer spawns.
 
 ## [0.1.1] - 2022-10-09
 
