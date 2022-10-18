@@ -119,14 +119,14 @@ namespace InfiniteFriends.Patches
             // Check if the player would be spawned in a wall/lava
             static bool IsLegalSpawn(Vector3 pos)
             {
-                RaycastHit2D worldRaycast = Physics2D.Raycast(pos, Vector2.up, 0.01f, GameController.instance.worldLayers);
+                Collider2D suffocate = Physics2D.OverlapCircle(pos, 0.02f, GameController.instance.worldLayers);
 
                 bool old = Physics2D.queriesHitTriggers; // Just Physics2D things
                 Physics2D.queriesHitTriggers = true;
                 Collider2D deathZone = Physics2D.OverlapCircle(pos, 15f, LayerMask.GetMask("Hazard"));
                 Physics2D.queriesHitTriggers = old;
 
-                return (!worldRaycast.collider && !deathZone);
+                return (!suffocate && !deathZone);
             }
 
             // Init
@@ -224,13 +224,13 @@ namespace InfiniteFriends.Patches
                     do
                     {
                         if (++attempts > 25)
-                    {
+                        {
                             PatchLogger.LogWarning($"Spawn platform '{platform.collider.name}' exceeded maximum spawning attempts ({attempts+1}), removing from spawning pool.");
                             platforms.RemoveAt(index);
                             index = ChoosePlatform(ref platforms);
                             platform = platforms[index];
                             attempts = 1;
-                    }
+                        }
 
                         // Choose a random point inbounds
                         Vector2 point = new Vector2(
@@ -238,7 +238,8 @@ namespace InfiniteFriends.Patches
                             UnityEngine.Random.Range(inbounds.min.y, inbounds.max.y));
 
                         // Magnetise to the platform perimeter
-                        spawn.position = platform.collider.ClosestPoint(point);
+                        Vector2 closest = platform.collider.ClosestPoint(point);
+                        spawn.position = closest + 5f*(point - closest).normalized;
                     }
                     while (!IsLegalSpawn(spawn.position));
 
