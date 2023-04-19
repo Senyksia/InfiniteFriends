@@ -12,7 +12,7 @@ namespace InfiniteFriends
         /// </summary>
         public const string PLUGIN_NAME = "InfiniteFriends";
 
-        public const string PLUGIN_SHORT_NAME = "IF";
+        public const string PLUGIN_SHORT_NAME = "InF";
 
         /// <summary>
         /// Unique ID of the plugin.

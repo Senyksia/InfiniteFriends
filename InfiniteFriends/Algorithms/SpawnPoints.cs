@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace InfiniteFriends.Algorithms
 {
-    public class SpawnPoints
+    public static class SpawnPoints
     {
         public static List<Transform> spawns = new List<Transform>();
         public static Scene lastScene;
@@ -214,6 +214,7 @@ namespace InfiniteFriends.Algorithms
                 {
                     if (++attempts > 25)
                     {
+                        InfiniteFriends.logger.LogWarning((string)$"Spawn platform '{platform.collider.name}' exceeded maximum spawning attempts ({attempts+1}), removing from spawning pool.");
                         platforms.RemoveAt(platformIndex);
                         platformIndex = ChooseWeightedPlatform(ref platforms);
                         platform = platforms[platformIndex];
