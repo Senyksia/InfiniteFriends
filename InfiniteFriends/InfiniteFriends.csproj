@@ -4,12 +4,15 @@
     <RootNamespace>InfiniteFriends</RootNamespace>
     <AssemblyName>InfiniteFriends</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="MyScriptAssembly">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\MyScriptAssembly.dll</HintPath>
-    </Reference>
+      <Reference Include="MyScriptAssembly">
+          <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\MyScriptAssembly.dll</HintPath>
+      </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\Unity.InputSystem.dll</HintPath>
     </Reference>
