@@ -47,11 +47,16 @@ namespace InfiniteFriends.Patches
         static bool Prefix(LobbyController __instance, ref Transform[] __result)
         {
             // Regenerate spawn points for a new scene
-            if (SpawnPoints.lastScene != SceneManager.GetActiveScene())
+            if (SpawnPoints.lastScene != SceneManager.GetActiveScene() || SpawnPoints.spawns[0] == null)
             {
                 SpawnPoints.lastScene = SceneManager.GetActiveScene();
-                SpawnPoints.spawns = SpawnPoints.GetDefaultSpawnPoints();
-                SpawnPoints.GenerateSpawnPoints(LobbyController.instance.CountPlayers() - SpawnPoints.spawns.Count);
+                SpawnPoints.spawns = SpawnPoints.GetDefaultSpawnPoints().ToList();
+
+                // Some scenes actually just don't have default spawns; we take the hint and skedaddle
+                if (SpawnPoints.spawns.Count > 0)
+                {
+                    SpawnPoints.GenerateSpawnPoints(LobbyController.instance.CountPlayers() - SpawnPoints.spawns.Count);
+                }
             }
 
             __result = SpawnPoints.spawns.ToArray();
@@ -66,7 +71,7 @@ namespace InfiniteFriends.Patches
         [HarmonyPrefix]
         static bool Prefix()
         {
-            if (SpawnPoints.spawns.Count < PlayerInputManager.instance.playerCount)
+            if (0 < SpawnPoints.spawns.Count && SpawnPoints.spawns.Count < PlayerInputManager.instance.playerCount)
             {
                 SpawnPoints.GenerateSpawnPoints(1);
             }

@@ -53,14 +53,16 @@ namespace InfiniteFriends.Algorithms
         }
 
         // Get the 4 static spawn points for the current scene
-        public static List<Transform> GetDefaultSpawnPoints()
+        // Replicate LobbyController.GetSpawnPoints
+        public static Transform[] GetDefaultSpawnPoints()
         {
+            Transform[] defaultSpawns = new Transform[4];
             GameObject spawnPoints = GameObject.Find("SpawnPoints");
-            List<Transform> defaultSpawns = new List<Transform>();
+            if (!spawnPoints) return defaultSpawns;
 
             for (int i = 0; i < spawnPoints.transform.childCount; i++)
             {
-                defaultSpawns.Add(spawnPoints.transform.GetChild(i));
+                defaultSpawns[i] = spawnPoints.transform.GetChild(i);
             }
 
             return defaultSpawns;
@@ -72,7 +74,7 @@ namespace InfiniteFriends.Algorithms
         static bool IsAirborneLevel(List<SpawnPlatform> platforms)
         {
 
-            foreach (Transform spawn in GetDefaultSpawnPoints())
+            foreach (Transform spawn in GetDefaultSpawnPoints().ToList())
             {
                 foreach (SpawnPlatform platform in platforms)
                 {
@@ -162,7 +164,7 @@ namespace InfiniteFriends.Algorithms
 
         static void GenerateAirborneSpawnPoints(int spawnCount)
         {
-            List<Transform> defaultSpawns = GetDefaultSpawnPoints();
+            List<Transform> defaultSpawns = GetDefaultSpawnPoints().ToList();
 
             // Find the minimum distance between any two default spawns
             float minDist = float.PositiveInfinity;
