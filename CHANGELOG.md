@@ -1,8 +1,16 @@
 # Changelog
 
-Based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)!
+Based on [Keep a Changelog](https://keepachangelog.com)!
 
 ## [Unreleased]
+
+### Added
+- Parkour, tiers, and the map editor, can now be joined with more than one player.
+
+### Fixed
+- Crash when trying to load parkour or the map editor.
+- Crash when trying to load the map Skulls.
+- Zero-gravity levels now follow airborne spawning logic by default (same as the lobby).
 
 ## [0.2.0] - 2023-04-14
 
