@@ -73,13 +73,12 @@ namespace InfiniteFriends.Algorithms
         // TODO: Remove this and just detect no-gravity instead.
         static bool IsAirborneLevel(List<SpawnPlatform> platforms)
         {
-
             foreach (Transform spawn in GetDefaultSpawnPoints().ToList())
             {
                 foreach (SpawnPlatform platform in platforms)
                 {
-                    Vector2 point = platform.collider.ClosestPoint(spawn.position);
-                    if (Vector2.Distance(point, spawn.position) < 50f) // 50f is the wall magnet distance
+                    Vector2 closest = platform.collider.ClosestPoint(spawn.position);
+                    if (Vector2.Distance(closest , spawn.position) < 50f) // 50f is the wall magnet distance
                     {
                         return false;
                     }
@@ -136,11 +135,11 @@ namespace InfiniteFriends.Algorithms
             // Get all platform colliders
             Collider2D[] colliders = GameObject.FindObjectsOfType<Collider2D>();
             List<SpawnPlatform> platforms = new List<SpawnPlatform>();
-            string[] platformNames = new string[] { "Base", "Box", "Floor", "Platform", "WorldShape" };
+            string[] platformNames = new string[] { "Base", "BottomPlat", "Box", "Floor", "Platform", "Spire", "Support", "WorldShape"};
 
             // Get approximate level bounds
             Collider2D confiner = (from c in colliders where c.name == "Confiner" select c).First();
-            Bounds inbounds = new Bounds(confiner.bounds.center, confiner.bounds.size + new Vector3(200f, 200f, 0.2f));
+            Bounds inbounds = new Bounds(confiner.bounds.center, confiner.bounds.size + new Vector3(200f, 200f, 0.5f));
 
             foreach (Collider2D collider in colliders)
             {
@@ -230,7 +229,7 @@ namespace InfiniteFriends.Algorithms
 
                     // Magnetise to the platform perimeter
                     Vector2 closest = platform.collider.ClosestPoint(point);
-                    spawn.position = closest + 5f*(point - closest).normalized;
+                    spawn.position = closest + 5f*(point - closest).normalized; // This isn't smart but it works
                 }
                 while (!IsLegalSpawn(spawn.position));
 
