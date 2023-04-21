@@ -8,8 +8,8 @@ namespace InfiniteFriends.Algorithms
 {
     public static class SpawnPoints
     {
-        public static List<Transform> spawns = new List<Transform>();
-        public static Scene lastScene;
+        public static List<Transform> spawns = new Transform[4].ToList();
+        public static GameLevel lastLevel;
 
         // A Collider2D wrapper that holds spawning information
         class SpawnPlatform : IComparable<SpawnPlatform>
@@ -70,9 +70,10 @@ namespace InfiniteFriends.Algorithms
 
         // Check the distance between each spawn and every platform.
         // If no spawns are near a platform, the level is considered airborne.
-        // TODO: Remove this and just detect no-gravity instead.
         static bool IsAirborneLevel(List<SpawnPlatform> platforms)
         {
+            if (LevelController.instance.activeLevel.zeroGravity) return true;
+
             foreach (Transform spawn in GetDefaultSpawnPoints().ToList())
             {
                 foreach (SpawnPlatform platform in platforms)
@@ -130,7 +131,7 @@ namespace InfiniteFriends.Algorithms
         // TODO: Choose fairer locations (not next to another player)
         public static void GenerateSpawnPoints(int spawnCount)
         {
-            if (spawnCount < 1) return;
+            if (spawnCount < 1 || SpawnPoints.spawns[0] == null) return;
 
             // Get all platform colliders
             Collider2D[] colliders = GameObject.FindObjectsOfType<Collider2D>();
