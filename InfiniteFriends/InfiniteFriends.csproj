@@ -28,6 +28,12 @@
     <Reference Include="UnityEngine.Physics2DModule">
       <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
