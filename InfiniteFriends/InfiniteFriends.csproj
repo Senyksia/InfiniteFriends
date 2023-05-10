@@ -10,9 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <Reference Include="MyScriptAssembly">
-          <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\MyScriptAssembly.dll</HintPath>
-      </Reference>
+    <Reference Include="MyScriptAssembly">
+      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\MyScriptAssembly.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\Unity.InputSystem.dll</HintPath>
     </Reference>
@@ -33,6 +33,9 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 

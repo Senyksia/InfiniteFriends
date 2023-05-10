@@ -1,13 +1,15 @@
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace InfiniteFriends.Patches
 {
-    // Replace hardcoded max player values
     [HarmonyPatch(typeof(VersusScoreboard), "Awake")]
     class VersusScoreboard_Patch_Awake
     {
+        // Replace hardcoded max player values
         // Transpiles
         //    > this._versusScoreDisplay = new VersusScoreUi[4]
         // to > this._versusScoreDisplay = new VersusScoreUi[InfiniteFriends.MaxPlayerHardCap]
@@ -30,6 +32,19 @@ namespace InfiniteFriends.Patches
                     yield return enumerator.Current;
                 }
             }
+        }
+
+        // Swap out HorizontalLayoutGroup for GridLayoutGroup to display more scores
+        // As GridLayoutGroup doesn't have forceExpandChildren, scores won't fill the entire width
+        [HarmonyPostfix]
+        static void Postfix(VersusScoreUi[] ____versusScoreDisplay)
+        {
+            GameObject layoutGroup = ____versusScoreDisplay[0].transform.parent.gameObject;
+            HorizontalLayoutGroup.DestroyImmediate(layoutGroup.GetComponent<HorizontalLayoutGroup>());
+            GridLayoutGroup grid = layoutGroup.AddComponent<GridLayoutGroup>();
+            grid.childAlignment = TextAnchor.MiddleCenter;
+            grid.cellSize = new Vector2(100f, 40f);
+            grid.padding = new RectOffset(Mathf.RoundToInt(-grid.cellSize.x), 0, 40, 0);
         }
     }
 
