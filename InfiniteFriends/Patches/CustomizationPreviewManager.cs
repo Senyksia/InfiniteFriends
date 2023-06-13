@@ -9,10 +9,10 @@ namespace InfiniteFriends.Patches
      */
 
     [HarmonyPatch(typeof(CustomizationPreviewManager), "Awake")]
-    class CustomizationPreviewManager_Patch_Awake
+    internal class CustomizationPreviewManager_Patch_Awake
     {
         [HarmonyPrefix]
-        static bool Prefix(ref List<SpiderCustomizer> ___previewCustomizers, ref List<Animator> ___previewAnimators)
+        internal static bool Prefix(ref List<SpiderCustomizer> ___previewCustomizers, ref List<Animator> ___previewAnimators)
         {
             // Widen texture atlas
             Camera previewCamera = ___previewCustomizers[0].transform.parent.parent.GetComponentInChildren<Camera>(true);

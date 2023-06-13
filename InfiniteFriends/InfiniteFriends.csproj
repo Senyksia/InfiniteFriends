@@ -1,58 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <RootNamespace>InfiniteFriends</RootNamespace>
-    <AssemblyName>InfiniteFriends</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <DebugType>portable</DebugType>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="MyScriptAssembly">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\MyScriptAssembly.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.InputSystem">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\Unity.InputSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Netcode.Runtime">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Physics2DModule">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>$(GameFolder)\SpiderHeckApp_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
-    </Reference>
+    <Reference Include="MyScriptAssembly" />
+    <Reference Include="DoozyEngine" />
+    <Reference Include="I2" />
+    <Reference Include="Unity.InputSystem" />
+    <Reference Include="Unity.Netcode.Runtime" />
+    <Reference Include="Unity.TextMeshPro" />
+    <Reference Include="UnityEngine.UI" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="0Harmony.dll">
-      <HintPath>..\Assemblies\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Core">
-      <HintPath>..\Assemblies\BepInEx.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Unity">
-      <HintPath>..\Assemblies\BepInEx.Unity.dll</HintPath>
-    </Reference>
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="UnityEngine.Modules" Version="2020.3.42" IncludeAssets="compile" />
   </ItemGroup>
 
-  <Target Name="Copy" AfterTargets="Build" Condition="'$(GameFolder)' != ''">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameFolder)\BepInEx\plugins\" UseSymboliclinksIfPossible="true" />
+  <Target Name="CopyToBepInEx" AfterTargets="PostBuildEvent" Condition="'$(GameDir)' != '' And '$(GameDir)' != 'path\to\SpiderHeck'">
+    <Exec Command="taskkill /F /T /IM &quot;$(GameExe)&quot; /FI &quot;STATUS eq RUNNING&quot;" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameDir)\BepInEx\plugins\senyksia-InfiniteFriends-DEV\" UseSymboliclinksIfPossible="true" />
   </Target>
-
 </Project>

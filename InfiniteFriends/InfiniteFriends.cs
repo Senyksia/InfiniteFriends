@@ -1,36 +1,37 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-#if DEBUG
-using HarmonyLib.Tools;
-#endif
 using System;
 using System.Reflection;
 
 namespace InfiniteFriends
 {
-    [BepInPlugin(PluginInfo.PLUGIN_ID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin(Metadata.PLUGIN_GUID, Metadata.PLUGIN_NAME, Metadata.PLUGIN_VERSION)]
     [BepInProcess("SpiderHeckApp.exe")]
-    public class InfiniteFriends : BaseUnityPlugin
+    internal class InfiniteFriends : BaseUnityPlugin
     {
         // Config
         public const int MaxPlayerHardCap = 32;
-        public static ManualLogSource logger;
 
-        public void Awake()
+        public static InfiniteFriends Instance;
+        internal static new ManualLogSource Logger { get; private set; }
+
+        private InfiniteFriends()
         {
-#if DEBUG
-            HarmonyFileLog.Enabled = true;
-#endif
-            logger = BepInEx.Logging.Logger.CreateLogSource(PluginInfo.PLUGIN_SHORT_NAME);
+            InfiniteFriends.Instance = this;
+        }
+
+        protected void Awake()
+        {
+            InfiniteFriends.Logger = BepInEx.Logging.Logger.CreateLogSource(Metadata.PLUGIN_NAME_SHORT);
 
             try
             {
-                Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PluginInfo.PLUGIN_ID);
+                Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), Metadata.PLUGIN_GUID);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.LogError(e.ToString());
+                InfiniteFriends.Logger.LogError(ex.ToString());
             }
         }
     }

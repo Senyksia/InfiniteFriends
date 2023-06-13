@@ -5,10 +5,10 @@ namespace InfiniteFriends.Patches
 {
     // Generate new `PlayerPingContainer`s to handle more than 4 players
     [HarmonyPatch(typeof(PlayerPingManager), nameof(PlayerPingManager.Instantiate))]
-    class PlayerPingManager_Patch_Instantiate
+    internal class PlayerPingManager_Patch_Instantiate
     {
         [HarmonyPrefix]
-        static bool Prefix(ref List<PlayerPingContainer> ___playerContainers, LobbyController ___lobbyController)
+        internal static bool Prefix(ref List<PlayerPingContainer> ___playerContainers, LobbyController ___lobbyController)
         {
             // Append the list with clones as necessary
             while (___playerContainers.Count < ___lobbyController.spawnedPlayers.Count)

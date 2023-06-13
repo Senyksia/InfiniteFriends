@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace InfiniteFriends.Patches
 {
     [HarmonyPatch(typeof(VersusScoreboard), "Awake")]
-    class VersusScoreboard_Patch_Awake
+    internal class VersusScoreboard_Patch_Awake
     {
         // Replace hardcoded max player values
         // Transpiles
@@ -16,7 +16,7 @@ namespace InfiniteFriends.Patches
         //    > for (int i = 0; i < 4; i++)
         // to > for (int i = 0; i < InfiniteFriends.MaxPlayerHardCap; i++)
         [HarmonyTranspiler]
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
             CodeInstruction replace = new CodeInstruction(OpCodes.Ldc_I4, InfiniteFriends.MaxPlayerHardCap);
@@ -37,7 +37,7 @@ namespace InfiniteFriends.Patches
         // Swap out HorizontalLayoutGroup for GridLayoutGroup to display more scores
         // As GridLayoutGroup doesn't have forceExpandChildren, scores won't fill the entire width
         [HarmonyPostfix]
-        static void Postfix(VersusScoreUi[] ____versusScoreDisplay)
+        internal static void Postfix(VersusScoreUi[] ____versusScoreDisplay)
         {
             GameObject layoutGroup = ____versusScoreDisplay[0].transform.parent.gameObject;
             HorizontalLayoutGroup.DestroyImmediate(layoutGroup.GetComponent<HorizontalLayoutGroup>());
@@ -50,7 +50,7 @@ namespace InfiniteFriends.Patches
 
     // Replace hardcoded max player values
     [HarmonyPatch(typeof(VersusScoreboard), "Update")]
-    class VersusScoreboard_Patch_Update
+    internal class VersusScoreboard_Patch_Update
     {
         // Transpiles
         //    > for (int j = this._playerScores.Count; j < 4; j++)
@@ -58,7 +58,7 @@ namespace InfiniteFriends.Patches
         //    > for (int k = 0; k < 4; k++)
         // to > for (int k = 0; k < InfiniteFriends.MaxPlayerHardCap; k++)
         [HarmonyTranspiler]
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
             CodeInstruction replace = new CodeInstruction(OpCodes.Ldc_I4, InfiniteFriends.MaxPlayerHardCap);

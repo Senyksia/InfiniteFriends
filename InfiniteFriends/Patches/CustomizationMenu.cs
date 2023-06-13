@@ -68,10 +68,10 @@ namespace InfiniteFriends.Patches
      */
 
     [HarmonyPatch(typeof(CustomizationMenu), "Start")]
-    class CustomizationMenu_Patch_Start
+    internal class CustomizationMenu_Patch_Start
     {
         [HarmonyPrefix]
-        static bool Prefix(ref CustomizationPanel[] ___customizationPanels)
+        internal static bool Prefix(ref CustomizationPanel[] ___customizationPanels)
         {
             List<CustomizationPanel> panels = ___customizationPanels.ToList();
 

@@ -3,6 +3,9 @@
 Based on [Keep a Changelog](https://keepachangelog.com)!
 
 ## [Unreleased]
+### Added
+- More than four panels in the customization menu.
+- More scoreboard scores.
 
 ## [0.2.1] - 2023-04-21
 

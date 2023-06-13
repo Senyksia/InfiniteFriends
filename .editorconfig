@@ -9,5 +9,13 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 
 # XML project files
-[*.{csproj,csproj.user}]
+[*.{csproj,csproj.user,props}]
 indent_size = 2
+
+# .NET
+[*.cs]
+dotnet_diagnostic.IDE0002.severity = none
+dotnet_style_qualification_for_field = true
+dotnet_style_qualification_for_property = true
+dotnet_style_qualification_for_method = true
+dotnet_style_qualification_for_event = true

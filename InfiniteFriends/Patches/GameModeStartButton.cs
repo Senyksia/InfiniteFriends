@@ -6,13 +6,13 @@ namespace InfiniteFriends.Patches
 {
     // Bypass 1 player limit for certain gamemode buttons
     [HarmonyPatch(typeof(GameModeStartButton), "StartCountDown")]
-    class GameModeStartButton_Patch_StartCountDown
+    internal class GameModeStartButton_Patch_StartCountDown
     {
         // Transpiles
         //    > playerCount != 1
         // to > playerCount < 1
         [HarmonyTranspiler]
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
             List<CodeInstruction> match = new List<CodeInstruction>()
@@ -45,13 +45,13 @@ namespace InfiniteFriends.Patches
 
     // The parkour button has an additional 1 player check
     [HarmonyPatch(typeof(GameModeStartButton), "ShowGameModePrompt")]
-    class GameModeStartButton_Patch_ShowGameModePrompt
+    internal class GameModeStartButton_Patch_ShowGameModePrompt
     {
         // Transpiles
         //    > LobbyController.instance.GetPlayerCount() == 1
         // to > LobbyController.instance.GetPlayerCount() >= 1
         [HarmonyTranspiler]
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
             List<CodeInstruction> match = new List<CodeInstruction>()
@@ -86,10 +86,10 @@ namespace InfiniteFriends.Patches
 
     // Remove "ONLY 1 PLAYER ALLOWED" text that shows above start buttons
     [HarmonyPatch(typeof(GameModeStartButton), "Start")]
-    class GameModeStartButton_Patch_Start
+    internal class GameModeStartButton_Patch_Start
     {
         [HarmonyPrefix]
-        static bool Prefix(ref string ____onePlayerMaxString)
+        internal static bool Prefix(ref string ____onePlayerMaxString)
         {
             ____onePlayerMaxString = ""; // Sledgehammer approach
             return true;

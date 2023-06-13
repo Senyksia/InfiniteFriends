@@ -4,7 +4,7 @@
 
 :tada::spider::spider::spider::spider::spider::tada:
 <br />**Multiplayer beyond 4 people**
-<br />A [BepInHecks](https://github.com/cobwebsh/BepInEx) plugin for the game [SpiderHeck](https://store.steampowered.com/app/1329500/SpiderHeck/)
+<br />A [BepInEx](https://github.com/BepInEx/BepInEx) plugin for the game [SpiderHeck](https://store.steampowered.com/app/1329500/SpiderHeck)
 
 ### [Installation](#installation) • [Contributing](#contributing) • [TODO](#todo) • [Changelog](#changelog)
 
@@ -21,10 +21,10 @@
 
    On Windows, it will typically be located at `C:\Program Files (x86)\Steam\steamapps\common\SpiderHeck`.
 
-2. **Install BepInHecks**
+2. **Install BepInEx**
 
-   Follow the instructions for using the [installer](https://github.com/cobwebsh/bepinhecks-installer).
-   <br />Alternatively, you can manually install the [latest release](https://github.com/cobwebsh/BepInHecks/releases/latest).
+   Follow the [instructions](https://docs.bepinex.dev/articles/user_guide/installation/index.html#installing-bepinex-1) for installing BepInEx 5.
+   <br />When downloading BepInEx, choose the latest stable x64 release of BepInEx 5, which can be found [here](https://github.com/BepInEx/BepInEx/releases/latest).
 
 3. **Install InfiniteFriends**
 
@@ -42,22 +42,22 @@
    Create a file called `InfiniteFriends.csproj.user` next to `InfiniteFriends.csproj`.
    ```xml
    <?xml version="1.0" encoding="utf-8"?>
-   <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <Project>
      <PropertyGroup>
-       <GameFolder>path/to/SpiderHeck</GameFolder>
+       <GameFolder>path\to\SpiderHeck</GameFolder>                                              <!-- User-defined absolute path to SpiderHeck -->
+       <ReferencePath>$(ReferencePath);$(GameFolder)\SpiderHeckApp_Data\Managed</ReferencePath> <!-- Path to the SH game assemblies -->
+       <AssemblySearchPaths>$(AssemblySearchPaths);$(ReferencePath)</AssemblySearchPaths>       <!-- Add that path to the assembly search list -->
      </PropertyGroup>
    </Project>
    ```
-   Replace `path/to/SpiderHeck` with the absolute path to your SpiderHeck directory. E.g.
+   Replace `path\to\SpiderHeck` with the absolute path to your SpiderHeck directory. E.g.
    ```xml
    <GameFolder>C:\Program Files (x86)\Steam\steamapps\common\SpiderHeck</GameFolder>
    ```
 
 3. **Compile**
 
-   Using Visual Studio, a copy of the compiled .dll should be placed directly in your mod folder.
-   > **Note**
-   > The game needs to be closed while compiling.
+   Using Visual Studio, the game will be closed, and a copy of the compiled .dll should be placed directly into your mod folder.
 
 
 ## TODO

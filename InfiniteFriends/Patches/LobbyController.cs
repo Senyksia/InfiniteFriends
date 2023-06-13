@@ -10,13 +10,13 @@ namespace InfiniteFriends.Patches
 {
     // Extend the array length for player indexes
     [HarmonyPatch(typeof(LobbyController), MethodType.Constructor)]
-    class LobbyController_Patch_Ctor
+    internal class LobbyController_Patch_Ctor
     {
         // Transpiles
         //    > private PlayerController[] _playerIndexes = new PlayerController[4]
         // to > private PlayerController[] _playerIndexes = new PlayerController[InfiniteFriends.MaxPlayerHardCap];
         [HarmonyTranspiler]
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             CodeInstruction[] array = instructions.ToArray();
             CodeInstruction match = new CodeInstruction(OpCodes.Stfld, AccessTools.Field(typeof(LobbyController), "_playerIndexes"));
@@ -40,10 +40,10 @@ namespace InfiniteFriends.Patches
 
     // Inject our generated spawn points
     [HarmonyPatch(typeof(LobbyController), nameof(LobbyController.GetSpawnPoints))]
-    class LobbyController_Patch_GetSpawnPoints
+    internal class LobbyController_Patch_GetSpawnPoints
     {
         [HarmonyPrefix]
-        static bool Prefix(LobbyController __instance, ref Transform[] __result)
+        internal static bool Prefix(LobbyController __instance, ref Transform[] __result)
         {
             // Regenerate spawn points for a new level
             if (SpawnPoints.lastLevel != LevelController.instance.activeLevel || SpawnPoints.spawns[0] == null)
@@ -61,10 +61,10 @@ namespace InfiniteFriends.Patches
 
     // Generate a spawn point for a new player
     [HarmonyPatch(typeof(LobbyController), "OnPlayerJoined")]
-    class LobbyController_Patch_OnPlayerJoined
+    internal class LobbyController_Patch_OnPlayerJoined
     {
         [HarmonyPrefix]
-        static bool Prefix()
+        internal static bool Prefix()
         {
             if (SpawnPoints.spawns.Count < PlayerInputManager.instance.playerCount)
             {
@@ -76,10 +76,10 @@ namespace InfiniteFriends.Patches
 
     // Intercept maxPlayers and reassign to InfiniteFriends.MaxPlayerHardCap
     [HarmonyPatch(typeof(LobbyController), nameof(LobbyController.SetMaxPlayer))]
-    class LobbyController_Patch_SetMaxPlayer
+    internal class LobbyController_Patch_SetMaxPlayer
     {
         [HarmonyPrefix]
-        static bool Prefix(ref int maxPlayers)
+        internal static bool Prefix(ref int maxPlayers)
         {
             maxPlayers = InfiniteFriends.MaxPlayerHardCap;
             return true;
@@ -88,10 +88,10 @@ namespace InfiniteFriends.Patches
 
     // Override the initial max players value
     [HarmonyPatch(typeof(LobbyController), "Start")]
-    class LobbyController_Patch_Start
+    internal class LobbyController_Patch_Start
     {
         [HarmonyPostfix]
-        static void Postfix(ref LobbyController __instance)
+        internal static void Postfix(ref LobbyController __instance)
         {
             __instance.SetMaxPlayer(InfiniteFriends.MaxPlayerHardCap);
         }

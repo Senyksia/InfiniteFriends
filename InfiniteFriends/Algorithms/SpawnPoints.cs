@@ -215,7 +215,7 @@ namespace InfiniteFriends.Algorithms
                 {
                     if (++attempts > 25)
                     {
-                        InfiniteFriends.logger.LogWarning((string)$"Spawn platform '{platform.collider.name}' exceeded maximum spawning attempts ({attempts+1}), removing from spawning pool.");
+                        InfiniteFriends.Logger.LogWarning((string)$"Spawn platform '{platform.collider.name}' exceeded maximum spawning attempts ({attempts+1}), removing from spawning pool.");
                         platforms.RemoveAt(platformIndex);
                         platformIndex = ChooseWeightedPlatform(ref platforms);
                         platform = platforms[platformIndex];
