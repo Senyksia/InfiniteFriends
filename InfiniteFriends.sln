@@ -7,14 +7,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniteFriends", "Infinite
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		BepInEx-Release|Any CPU = BepInEx-Release|Any CPU
+		ModWeaver-Debug|Any CPU = ModWeaver-Debug|Any CPU
+		BepInEx-Debug|Any CPU = BepInEx-Debug|Any CPU
+		ModWeaver-Release|Any CPU = ModWeaver-Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BA938F91-C585-4AB7-BA4F-590CD4604915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA938F91-C585-4AB7-BA4F-590CD4604915}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA938F91-C585-4AB7-BA4F-590CD4604915}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BA938F91-C585-4AB7-BA4F-590CD4604915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA938F91-C585-4AB7-BA4F-590CD4604915}.BepInEx-Release|Any CPU.ActiveCfg = BepInEx-Release|Any CPU
+		{BA938F91-C585-4AB7-BA4F-590CD4604915}.BepInEx-Release|Any CPU.Build.0 = BepInEx-Release|Any CPU
+		{BA938F91-C585-4AB7-BA4F-590CD4604915}.ModWeaver-Debug|Any CPU.ActiveCfg = ModWeaver-Debug|Any CPU
+		{BA938F91-C585-4AB7-BA4F-590CD4604915}.ModWeaver-Debug|Any CPU.Build.0 = ModWeaver-Debug|Any CPU
+		{BA938F91-C585-4AB7-BA4F-590CD4604915}.BepInEx-Debug|Any CPU.ActiveCfg = BepInEx-Debug|Any CPU
+		{BA938F91-C585-4AB7-BA4F-590CD4604915}.BepInEx-Debug|Any CPU.Build.0 = BepInEx-Debug|Any CPU
+		{BA938F91-C585-4AB7-BA4F-590CD4604915}.ModWeaver-Release|Any CPU.ActiveCfg = ModWeaver-Release|Any CPU
+		{BA938F91-C585-4AB7-BA4F-590CD4604915}.ModWeaver-Release|Any CPU.Build.0 = ModWeaver-Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

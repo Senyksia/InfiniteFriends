@@ -7,6 +7,26 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <Configurations>BepInEx-Debug;ModWeaver-Debug;BepInEx-Release;ModWeaver-Release</Configurations>
+    <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+    <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+    <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains('Release'))">
+    <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains('BepInEx'))">
+    <DefineConstants>$(DefineConstants);BEPINEX</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains('ModWeaver'))">
+    <DefineConstants>$(DefineConstants);MODWEAVER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,12 +40,31 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="UnityEngine.Modules" Version="2020.3.42" IncludeAssets="compile" />
   </ItemGroup>
 
-  <Target Name="CopyToBepInEx" AfterTargets="PostBuildEvent" Condition="'$(GameDir)' != '' And '$(GameDir)' != 'path\to\SpiderHeck'">
+  <ItemGroup Condition="$(Configuration.Contains('BepInEx'))">
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(Configuration.Contains('ModWeaver'))">
+    <Reference Include="0Harmony">
+      <HintPath>$(GameDir)\modweaver\libs\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="modweaver.core">
+      <HintPath>$(GameDir)\modweaver\libs\modweaver.core.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>$(GameDir)\modweaver\libs\NLog.dll</HintPath>
+    </Reference>
+    <!-- ModWeaver NuGet server seems to be broken currently -->
+    <!--    <PackageReference Include="modweaver.core" Version="1.1.0" />-->
+    <EmbeddedResource Include="mw.mod.toml" LogicalName="mw.mod.toml" />
+  </ItemGroup>
+
+  <Target Name="CopyToModLoader" AfterTargets="PostBuildEvent" Condition="'$(GameDir)' != '' And '$(GameDir)' != 'path\to\SpiderHeck'">
     <Exec Command="taskkill /F /T /IM &quot;$(GameExe)&quot; /FI &quot;STATUS eq RUNNING&quot;" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameDir)\BepInEx\plugins\senyksia-InfiniteFriends-DEV\" UseSymboliclinksIfPossible="true" />
+    <Copy Condition="$(Configuration.Contains('BepInEx'))" SourceFiles="$(TargetPath)" DestinationFolder="$(GameDir)\BepInEx\plugins" UseSymboliclinksIfPossible="true" />
+    <Copy Condition="$(Configuration.Contains('ModWeaver'))" SourceFiles="$(TargetPath)" DestinationFolder="$(GameDir)\modweaver\mods" UseSymboliclinksIfPossible="true" />
   </Target>
 </Project>
