@@ -11,8 +11,7 @@ namespace InfiniteFriends;
 
 internal partial class InfiniteFriends
 {
-     // Config
-     public const int MaxPlayerHardCap = 32;
+     public const int MAX_PLAYER_HARD_CAP = 32;
 
      public static InfiniteFriends Instance;
      internal new static ILogger Logger { get; private set; }

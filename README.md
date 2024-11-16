@@ -87,7 +87,7 @@
 - [x] Rewrite player spawning logic to scale fairly with more players.
 - [x] (Partial) Fix UI not scaling past ~6 players (Scoreboard, Customisation Menu, etc).
 - [ ] Add an option for spawning an initial weapon near each player, rather than a static 4.
-- [ ] Allow the user to set MaxPlayerHardCap.
+- [ ] Allow the user to set MAX_PLAYER_HARD_CAP.
 - [ ] Online?
 
 
