@@ -82,11 +82,18 @@ public static class SpawnPointManager
     public static void GenerateSpawnPoints(int spawnCount)
     {
         if (spawnCount < 1 || SpawnPointManager.SpawnPoints[0] == null) return;
+        Transform[] defaultSpawns = GetDefaultSpawnPoints();
+
+        // Keep spawns relatively close together, particularly on
+        // very large maps with dense default spawns (E.g. Lobby)
+        Bounds spawnBounds = new();
+        defaultSpawns.ToList().ForEach(t => spawnBounds.Encapsulate(t.position));
+        spawnBounds.size = 1.5f * new Vector3(Mathf.Max(spawnBounds.size.x, spawnBounds.size.y), Mathf.Max(spawnBounds.size.x, spawnBounds.size.y));
 
         // Get approximate level bounds
         Collider2D confiner = GameObject.Find("Confiner")?.GetComponent<Collider2D>();
         if (confiner == null) InfiniteFriends.Logger.LogWarning("This level is missing a confiner!?");
-        Bounds levelBounds = confiner ? new(confiner.bounds.center, confiner.bounds.size) : new(new(0, 0), new(200, 200));
+        Bounds levelBounds = confiner ? new(confiner.bounds.center, confiner.bounds.size) : new(new(0f, 0f), new(200f, 200f));
         levelBounds.Expand(200f);
 
         // Get A* pathfinding nodes for the default spawns.
@@ -94,7 +101,7 @@ public static class SpawnPointManager
         // a generated point and at least one default spawn, to avoid OOB spawns.
         if (AstarPath.active == null) InfiniteFriends.Logger.LogWarning("This level is missing an active pathfinder!"); // TODO: Unlikely, but we should still handle this
 
-        List<GraphNode> defaultNodes = GetDefaultSpawnPoints()
+        List<GraphNode> defaultNodes = defaultSpawns
             .Select(t => AstarPath.active.GetNearest(t.position, WalkableConstraint).node)
             .ToList();
         if (defaultNodes.All(n => n == null)) InfiniteFriends.Logger.LogWarning("Failed to map any default spawn to an A* graph node");
@@ -138,8 +145,8 @@ public static class SpawnPointManager
 
                     // Choose a random point within level bounds
                     spawn.position = new Vector2(
-                        UnityEngine.Random.Range(levelBounds.min.x, levelBounds.max.x),
-                        UnityEngine.Random.Range(levelBounds.min.y, levelBounds.max.y)
+                        UnityEngine.Random.Range(spawnBounds.min.x, spawnBounds.max.x),
+                        UnityEngine.Random.Range(spawnBounds.min.y, spawnBounds.max.y)
                     );
                 } while (!(IsLegalSpawn(spawn.position) && PathExists(spawn.position)));
 
