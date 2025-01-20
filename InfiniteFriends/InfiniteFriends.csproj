@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <Reference Include="MyScriptAssembly" />
+    <Reference Include="AstarPathfindingProject" />
     <Reference Include="DoozyEngine" />
     <Reference Include="I2" />
     <Reference Include="Unity.InputSystem" />

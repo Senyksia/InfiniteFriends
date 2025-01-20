@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using InfiniteFriends.Extensions;
+using Pathfinding;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -10,42 +12,12 @@ public static class SpawnPointManager
 {
     public static List<Transform> SpawnPoints = new Transform[4].ToList();
     public static GameLevel LastLevel;
+    private static readonly NNConstraint WalkableConstraint = NNConstraint.Default;
 
-    /// <summary>
-    /// A Collider2D wrapper that holds spawning information.
-    /// </summary>
-    private class SpawnPlatform : IComparable<SpawnPlatform>
+    static SpawnPointManager()
     {
-        public readonly Collider2D collider;
-        public readonly Bounds bounds;
-        public readonly float area;
-        public int spawnCount = 0;
-        public float weight => this.area / (2*this.spawnCount + 1);
-
-        public SpawnPlatform(Collider2D collider, Bounds inbounds)
-        {
-            this.collider = collider;
-
-            this.bounds = new Bounds(collider.bounds.center, collider.bounds.size);
-            this.bounds.min = new Vector3(
-                Math.Max(this.bounds.min.x, inbounds.min.x),
-                Math.Max(this.bounds.min.y, inbounds.min.y),
-                0);
-            this.bounds.max = new Vector3(
-                Math.Min(this.bounds.max.x, inbounds.max.x),
-                Math.Min(this.bounds.max.y, inbounds.max.y),
-                0);
-
-            this.area = this.bounds.size.x * this.bounds.size.y;
-        }
-
-        public int CompareTo(SpawnPlatform other)
-        {
-            if (other == null) return 1;
-            if (this.weight > other.weight) return 1;
-            if (this.weight < other.weight) return -1;
-            return 0;
-        }
+        SpawnPointManager.WalkableConstraint.constrainWalkability = true;
+        SpawnPointManager.WalkableConstraint.walkable = true;
     }
 
     // TODO: Why not just raycast?
@@ -53,15 +25,15 @@ public static class SpawnPointManager
     /// Check the distance between each default spawn point and every platform.
     /// If no spawn points are near a platform, the level is considered airborne.
     /// </summary>
-    private static bool IsAirborneLevel(List<SpawnPlatform> platforms)
+    private static bool IsAirborneLevel(List<Collider2D> platforms)
     {
         if (LevelController.instance.activeLevel.zeroGravity) return true;
 
         foreach (Transform spawn in GetDefaultSpawnPoints().ToList())
         {
-            foreach (SpawnPlatform platform in platforms)
+            foreach (Collider2D platform in platforms)
             {
-                Vector2 closest = platform.collider.ClosestPoint(spawn.position);
+                Vector2 closest = platform.ClosestPoint(spawn.position);
                 if (Vector2.Distance(closest , spawn.position) < 50f) // 50f is the wall magnet distance
                 {
                     return false;
@@ -71,6 +43,7 @@ public static class SpawnPointManager
         return true;
     }
 
+    // TODO: Detect if an unobstructed deathzone is below on airborne-gravity maps
     private static bool IsLegalSpawn(Vector3 pos)
     {
         Collider2D suffocate = Physics2D.OverlapCircle(pos, 0.02f, GameController.instance.worldLayers);
@@ -81,36 +54,6 @@ public static class SpawnPointManager
         Physics2D.queriesHitTriggers = old;
 
         return (!suffocate && !deathZone);
-    }
-
-    // TODO: Weight based on perimeter, rather than area.
-    /// <summary>
-    /// Chooses a random platform, weighted based on its bounded area and spawn count.
-    /// </summary>
-    /// <returns>The chosen platform's index.</returns>
-    private static int ChoosePlatformWeighted(ref List<SpawnPlatform> platforms)
-    {
-        // Ordered list of weights
-        platforms.Sort();
-        List<float> weights = (from p in platforms select p.weight).ToList();
-
-        // Cumulatively sum weights
-        for (int i = 1; i < weights.Count; i++)
-        {
-            weights[i] += weights[i-1];
-        }
-
-        // Normalise weights
-        for (int i = 0; i < weights.Count; i++)
-        {
-            weights[i] /= weights.Last();
-        }
-
-        // Pull a random float, and determine which weight region it falls under
-        float rand = UnityEngine.Random.value;
-        int index = 0;
-        while (rand > weights[index]) index++;
-        return index;
     }
 
     /// <summary>
@@ -135,114 +78,90 @@ public static class SpawnPointManager
     /// <summary>
     /// Adds new dynamic spawn points to <c>SpawnPointManager.SpawnPoints</c>.
     /// </summary>
-    /// <param name="spawnCount"></param>
+    /// <param name="spawnCount">Number of spawn points to generate</param>
     public static void GenerateSpawnPoints(int spawnCount)
     {
         if (spawnCount < 1 || SpawnPointManager.SpawnPoints[0] == null) return;
 
-        // Get all platform colliders
-        Collider2D[] colliders = Object.FindObjectsOfType<Collider2D>();
-        List<SpawnPlatform> platforms = [];
-        string[] platformNames = ["Base", "BottomPlat", "Box", "Floor", "Platform", "Spire", "Support", "WorldShape"];
-
         // Get approximate level bounds
-        Collider2D confiner = (from c in colliders where c.name == "Confiner" select c).First();
-        Bounds inbounds = new Bounds(confiner.bounds.center, confiner.bounds.size + new Vector3(200f, 200f, 0.5f));
+        Collider2D confiner = GameObject.Find("Confiner")?.GetComponent<Collider2D>();
+        if (confiner == null) InfiniteFriends.Logger.LogWarning("This level is missing a confiner!?");
+        Bounds levelBounds = confiner ? new(confiner.bounds.center, confiner.bounds.size) : new(new(0, 0), new(200, 200));
+        levelBounds.Expand(200f);
 
-        foreach (Collider2D collider in colliders)
-        {
-            // Is a type of platform AND inbounds
-            if (platformNames.Any(name => collider.name.StartsWith(name))
-             && inbounds.Intersects(collider.bounds))
-            {
-                platforms.Add(new SpawnPlatform(collider, inbounds));
-            }
-        }
+        // Get A* pathfinding nodes for the default spawns.
+        // These are used to validate that a path exists between
+        // a generated point and at least one default spawn, to avoid OOB spawns.
+        if (AstarPath.active == null) InfiniteFriends.Logger.LogWarning("This level is missing an active pathfinder!"); // TODO: Unlikely, but we should still handle this
 
-        if (IsAirborneLevel(platforms))
-        {
-            GenerateAirborneSpawnPoints(spawnCount);
-        }
-        else
-        {
-            GenerateGroundedSpawnPoints(spawnCount, platforms, inbounds);
-        }
-    }
+        List<GraphNode> defaultNodes = GetDefaultSpawnPoints()
+            .Select(t => AstarPath.active.GetNearest(t.position, WalkableConstraint).node)
+            .ToList();
+        if (defaultNodes.All(n => n == null)) InfiniteFriends.Logger.LogWarning("Failed to map any default spawn to an A* graph node");
+        bool PathExists(Vector3 pos) => defaultNodes.Any(n => PathUtilities.IsPathPossible(n, AstarPath.active.GetNearest(pos).node));
 
-    private static void GenerateAirborneSpawnPoints(int spawnCount)
-    {
-        List<Transform> defaultSpawns = GetDefaultSpawnPoints().ToList();
+        // Filter for valid platforms to spawn on
+        Collider2D[] colliders = Object.FindObjectsOfType<Collider2D>();
+        List<Collider2D> platforms = colliders
+            .Where(c => GameController.instance.worldLayers.Contains(c.gameObject.layer) && !c.isTrigger && levelBounds.Intersects(c.bounds))
+            .ToList();
 
-        // Find the minimum distance between any two default spawns
-        float minDist = float.PositiveInfinity;
-        for (int i = 0; i < defaultSpawns.Count; i++)
-        {
-            for (int j = i+1; j < defaultSpawns.Count; j++)
-            {
-                float dist = Vector3.Distance(defaultSpawns[i].position, defaultSpawns[j].position);
-                minDist = Math.Min(minDist, dist);
-            }
-        }
+        // Some platforms are erroneously disabled at this point,
+        // so we need to temporarily enable them to prevent
+        // `Collider2D.ClosestPoint` returning 0.
+        List<Collider2D> disabled = platforms
+            .Where(p => !p.enabled)
+            .ToList();
+        disabled.ForEach(p => p.enabled = true);
+
+        bool isAirborne = IsAirborneLevel(platforms);
 
         // Generate spawns
-        int currentCount = SpawnPointManager.SpawnPoints.Count;
-        for (int i = currentCount; i < currentCount+spawnCount; i++)
+        InfiniteFriends.Logger.LogDebug($"Generating {spawnCount} spawn points. Viable platforms: {platforms.Count} | Airborne: {isAirborne}");
+        int prevCount = SpawnPointManager.SpawnPoints.Count;
+        for (int i = 0; i < spawnCount; i++)
         {
             // Initialise a new spawn point
             Transform spawn = new GameObject().transform;
-            spawn.gameObject.name = (i+1).ToString(); // Consistency with default spawns
+            spawn.gameObject.name = (prevCount + i + 1).ToString(); // Consistency with default spawns
 
-            // Search for legal spawn locations around a random prior spawn
-            Vector2 initial = SpawnPointManager.SpawnPoints[UnityEngine.Random.Range(0, SpawnPointManager.SpawnPoints.Count)].position;
             do
             {
-                spawn.position = initial + UnityEngine.Random.insideUnitCircle.normalized * minDist;
-            }
-            while (!IsLegalSpawn(spawn.position));
-
-            SpawnPointManager.SpawnPoints.Add(spawn);
-        }
-    }
-
-    private static void GenerateGroundedSpawnPoints(int spawnCount, List<SpawnPlatform> platforms, Bounds inbounds)
-    {
-        // Generate spawns
-        int currentCount = SpawnPointManager.SpawnPoints.Count;
-        for (int i = currentCount; i < currentCount+spawnCount; i++)
-        {
-            // Initialise a new spawn point
-            Transform spawn = new GameObject().transform;
-            spawn.gameObject.name = (i+1).ToString(); // Consistency with default spawns
-
-            int platformIndex = ChoosePlatformWeighted(ref platforms);
-            SpawnPlatform platform = platforms[platformIndex];
-
-            // Attempt to find a legal spawn on the chosen platform
-            int attempts = 0;
-            do
-            {
-                if (++attempts > 25)
+                int atmpt = 0;
+                do
                 {
-                    InfiniteFriends.Logger.LogWarning((string)$"Spawn platform '{platform.collider.name}' exceeded maximum spawning attempts ({attempts+1}), removing from spawning pool.");
-                    platforms.RemoveAt(platformIndex);
-                    platformIndex = ChoosePlatformWeighted(ref platforms);
-                    platform = platforms[platformIndex];
-                    attempts = 1;
-                }
+                    if (atmpt++ >= 100)
+                    {
+                        InfiniteFriends.Logger.LogWarning("Failed to generate valid spawn point after maximum attempts. Something has gone very wrong!");
+                        goto Finalize; // ew
+                    }
 
-                // Choose a random point inbounds
-                Vector2 point = new Vector2(
-                    UnityEngine.Random.Range(inbounds.min.x, inbounds.max.x),
-                    UnityEngine.Random.Range(inbounds.min.y, inbounds.max.y));
+                    // Choose a random point within level bounds
+                    spawn.position = new Vector2(
+                        UnityEngine.Random.Range(levelBounds.min.x, levelBounds.max.x),
+                        UnityEngine.Random.Range(levelBounds.min.y, levelBounds.max.y)
+                    );
+                } while (!(IsLegalSpawn(spawn.position) && PathExists(spawn.position)));
 
-                // Magnetise to the platform perimeter
-                Vector2 closest = platform.collider.ClosestPoint(point);
-                spawn.position = closest + 5f*(point - closest).normalized; // This isn't smart but it works
-            }
-            while (!IsLegalSpawn(spawn.position));
+                if (isAirborne) continue;
 
-            platform.spawnCount++;
+                // Magnetise to closest platform
+                Vector2 closest = platforms
+                    .Select(p => p.ClosestPoint(spawn.position))
+                    .Where(v => v != (Vector2)spawn.position)
+                    .OrderBy(v => Vector2.Distance(v, spawn.position))
+                    .DefaultIfEmpty(spawn.position) // This is unlikely to occur
+                    .First();
+                if (closest == (Vector2)spawn.position) InfiniteFriends.Logger.LogWarning("Failed to find a valid nearby platform for the current spawn point");
+
+                spawn.position = closest + 5f * ((Vector2)spawn.position - closest).normalized; // Add some padding between the spawn and platform
+            } while (!IsLegalSpawn(spawn.position));
+
+            Finalize:
+            InfiniteFriends.Logger.LogDebug($"Adding spawn point {spawn.name}: {spawn.position}");
             SpawnPointManager.SpawnPoints.Add(spawn);
         }
+
+        disabled.ForEach(p => p.enabled = false);
     }
 }
