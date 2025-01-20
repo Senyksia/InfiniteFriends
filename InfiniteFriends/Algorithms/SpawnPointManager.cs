@@ -13,6 +13,7 @@ public static class SpawnPointManager
     public static List<Transform> SpawnPoints = new Transform[4].ToList();
     public static GameLevel LastLevel;
     private static readonly NNConstraint WalkableConstraint = NNConstraint.Default;
+    private static float _minDist = 100f;
 
     static SpawnPointManager()
     {
@@ -41,6 +42,18 @@ public static class SpawnPointManager
             }
         }
         return true;
+    }
+
+    // TODO: Hopefully temporary
+    /// <summary>
+    /// Determines if the given point is far enough from existing spawn points.
+    /// Failing this conditional eases the distance required.
+    /// </summary>
+    private static bool IsCorrectDistance(Vector3 pos)
+    {
+        bool ret = SpawnPoints.All(t => Vector2.Distance(t.position, pos) > _minDist);
+        if (!ret) _minDist *= 0.9f;
+        return ret;
     }
 
     // TODO: Detect if an unobstructed deathzone is below on airborne-gravity maps
@@ -83,6 +96,7 @@ public static class SpawnPointManager
     {
         if (spawnCount < 1 || SpawnPointManager.SpawnPoints[0] == null) return;
         Transform[] defaultSpawns = GetDefaultSpawnPoints();
+        SpawnPointManager._minDist = 100f;
 
         // Keep spawns relatively close together, particularly on
         // very large maps with dense default spawns (E.g. Lobby)
@@ -162,7 +176,7 @@ public static class SpawnPointManager
                 if (closest == (Vector2)spawn.position) InfiniteFriends.Logger.LogWarning("Failed to find a valid nearby platform for the current spawn point");
 
                 spawn.position = closest + 5f * ((Vector2)spawn.position - closest).normalized; // Add some padding between the spawn and platform
-            } while (!IsLegalSpawn(spawn.position));
+            } while (!(IsLegalSpawn(spawn.position) && IsCorrectDistance(spawn.position)));
 
             Finalize:
             InfiniteFriends.Logger.LogDebug($"Adding spawn point {spawn.name}: {spawn.position}");

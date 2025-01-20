@@ -20,6 +20,7 @@ Based on [Keep a Changelog](https://keepachangelog.com)!
 ### Fixed
 - Players spawning outside the playable area.
 - A bug which occasionally caused players to incorrectly spawn midair.
+- Players spawning unnecessarily close to each-other.
 
 ## [0.2.1] - 2023-04-21
 
