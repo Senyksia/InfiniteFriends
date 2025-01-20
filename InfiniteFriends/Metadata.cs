@@ -19,5 +19,5 @@ public static class Metadata
     /// <summary>
     /// Current plugin version.
     /// </summary>
-    public const string PLUGIN_VERSION    = "0.2.1";
+    public const string PLUGIN_VERSION    = "0.3.0";
 }
