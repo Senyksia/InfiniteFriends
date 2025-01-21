@@ -13,12 +13,16 @@
 
 ## Features
 
-- [x] Allow more than 4 players to join a single lobby.
-- [x] Removed player count limits on all game-modes.
-- [x] Dynamic spawn point generation once the initial four are claimed.
+- [x] Allows more than 4 players to join a single lobby.
+- [x] Removes player count limits on all game-modes.
+- [x] Dynamically generates spawn points once the initial four are claimed.
 - [x] (Partial) Improved UI scaling.
-- [ ] Spawn a weapon next to each dynamic spawn.
 - [ ] Online support?
+
+
+## Known Issues
+- Additional starting weapons are not spawned for dynamic spawn points.
+- UI performance is poor at very high player counts.
 
 
 ## Installation
@@ -89,9 +93,6 @@
 
    ModWeaver and BepInEx each have a build configuration.
    <br />Using Visual Studio or Rider, building will close the game and copy the compiled .dll directly into your mod folder.
-
-
-
 
 
 ## Changelog
