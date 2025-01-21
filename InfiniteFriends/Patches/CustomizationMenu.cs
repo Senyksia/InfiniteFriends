@@ -57,7 +57,7 @@ public class ScalingGridLayoutGroup : LayoutGroup
 /// Ideally this would be done dynamically, but the network manager is uncooperative after initialising its children.
 /// </summary>
 
-[HarmonyPatch(typeof(CustomizationMenu), "Start")]
+[HarmonyPatch(typeof(CustomizationMenu), nameof(CustomizationMenu.Start))]
 internal class CustomizationMenu_Patch_Start
 {
     [HarmonyPrefix]

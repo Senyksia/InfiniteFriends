@@ -30,18 +30,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="MyScriptAssembly" />
-    <Reference Include="AstarPathfindingProject" />
-    <Reference Include="DoozyEngine" />
-    <Reference Include="I2" />
-    <Reference Include="Unity.InputSystem" />
-    <Reference Include="Unity.Netcode.Runtime" />
-    <Reference Include="Unity.TextMeshPro" />
-    <Reference Include="UnityEngine.UI" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="UnityEngine.Modules" Version="2020.3.42" IncludeAssets="compile" />
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.*" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition="$(Configuration.Contains('BepInEx'))">
@@ -61,6 +51,17 @@
     <!-- ModWeaver NuGet server seems to be broken currently -->
     <!--    <PackageReference Include="modweaver.core" Version="1.1.0" />-->
     <EmbeddedResource Include="mw.mod.toml" LogicalName="mw.mod.toml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MyScriptAssembly" Publicize="true" />
+    <Reference Include="AstarPathfindingProject" />
+    <Reference Include="DoozyEngine" />
+    <Reference Include="I2" />
+    <Reference Include="Unity.InputSystem" />
+    <Reference Include="Unity.Netcode.Runtime" />
+    <Reference Include="Unity.TextMeshPro" />
+    <Reference Include="UnityEngine.UI" />
   </ItemGroup>
 
   <Target Name="CopyToModLoader" AfterTargets="PostBuildEvent" Condition="'$(GameDir)' != '' And '$(GameDir)' != 'path\to\SpiderHeck'">

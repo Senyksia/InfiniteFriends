@@ -7,7 +7,7 @@ namespace InfiniteFriends.Patches;
 /// <summary>
 /// Statically increase the number of preview spiders.
 /// </summary>
-[HarmonyPatch(typeof(CustomizationPreviewManager), "Awake")]
+[HarmonyPatch(typeof(CustomizationPreviewManager), nameof(CustomizationPreviewManager.Awake))]
 internal class CustomizationPreviewManager_Patch_Awake
 {
     [HarmonyPrefix]

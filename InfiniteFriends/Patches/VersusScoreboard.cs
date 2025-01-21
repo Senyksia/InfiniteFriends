@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace InfiniteFriends.Patches;
 
-[HarmonyPatch(typeof(VersusScoreboard), "Awake")]
+[HarmonyPatch(typeof(VersusScoreboard), nameof(VersusScoreboard.Awake))]
 internal class VersusScoreboard_Patch_Awake
 {
     // Replace hardcoded max player values
@@ -49,7 +49,7 @@ internal class VersusScoreboard_Patch_Awake
 }
 
 // Replace hardcoded max player values
-[HarmonyPatch(typeof(VersusScoreboard), "Update")]
+[HarmonyPatch(typeof(VersusScoreboard), nameof(VersusScoreboard.Update))]
 internal class VersusScoreboard_Patch_Update
 {
     // Transpiles

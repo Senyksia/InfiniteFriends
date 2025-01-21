@@ -5,7 +5,7 @@ using System.Reflection.Emit;
 namespace InfiniteFriends.Patches;
 
 // Bypass 1 player limit for certain gamemode buttons
-[HarmonyPatch(typeof(GameModeStartButton), "StartCountDown")]
+[HarmonyPatch(typeof(GameModeStartButton), nameof(GameModeStartButton.StartCountDown))]
 internal class GameModeStartButton_Patch_StartCountDown
 {
     // Transpiles
@@ -44,7 +44,7 @@ internal class GameModeStartButton_Patch_StartCountDown
 }
 
 // The parkour button has an additional 1 player check
-[HarmonyPatch(typeof(GameModeStartButton), "ShowGameModePrompt")]
+[HarmonyPatch(typeof(GameModeStartButton), nameof(GameModeStartButton.ShowGameModePrompt))]
 internal class GameModeStartButton_Patch_ShowGameModePrompt
 {
     // Transpiles
@@ -85,7 +85,7 @@ internal class GameModeStartButton_Patch_ShowGameModePrompt
 }
 
 // Remove "ONLY 1 PLAYER ALLOWED" text that shows above start buttons
-[HarmonyPatch(typeof(GameModeStartButton), "Start")]
+[HarmonyPatch(typeof(GameModeStartButton), nameof(GameModeStartButton.Start))]
 internal class GameModeStartButton_Patch_Start
 {
     [HarmonyPrefix]

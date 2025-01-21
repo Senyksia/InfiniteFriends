@@ -60,7 +60,7 @@ internal class LobbyController_Patch_GetSpawnPoints
 }
 
 // Generate a spawn point for a new player
-[HarmonyPatch(typeof(LobbyController), "OnPlayerJoined")]
+[HarmonyPatch(typeof(LobbyController), nameof(LobbyController.OnPlayerJoined))]
 internal class LobbyController_Patch_OnPlayerJoined
 {
     [HarmonyPrefix]
@@ -87,7 +87,7 @@ internal class LobbyController_Patch_SetMaxPlayer
 }
 
 // Override the initial max players value
-[HarmonyPatch(typeof(LobbyController), "Start")]
+[HarmonyPatch(typeof(LobbyController), nameof(LobbyController.Start))]
 internal class LobbyController_Patch_Start
 {
     [HarmonyPostfix]
