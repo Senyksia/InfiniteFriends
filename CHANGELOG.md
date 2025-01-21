@@ -6,6 +6,7 @@ Based on [Keep a Changelog](https://keepachangelog.com)!
 ### Fixed
 - Gamemode buttons not activating with more than one player in the lobby.
   This feature was broken by a game update at some point, but should now be fixed.
+- Players spawning past the starting point on parkour maps.
 
 ## [0.3.0] - 2025-01-20
 
