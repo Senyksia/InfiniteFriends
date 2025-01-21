@@ -3,6 +3,9 @@
 Based on [Keep a Changelog](https://keepachangelog.com)!
 
 ## [Unreleased]
+### Fixed
+- Gamemode buttons not activating with more than one player in the lobby.
+  This feature was broken by a game update at some point, but should now be fixed.
 
 ## [0.3.0] - 2025-01-20
 

@@ -17,7 +17,7 @@ internal class GameModeStartButton_Patch_StartCountDown
         using IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
         List<CodeInstruction> match =
         [
-            new(OpCodes.Ldloc_0),
+            new(OpCodes.Ldarg_1),
             new(OpCodes.Ldc_I4_1),
             new(OpCodes.Beq)
         ];
@@ -29,8 +29,7 @@ internal class GameModeStartButton_Patch_StartCountDown
         {
             if (enumerator.Current != null && enumerator.Current.opcode == match[score].opcode)
             {
-                score++;
-                if (score == match.Count)
+                if (++score == match.Count)
                 {
                     enumerator.Current.opcode = replace.opcode;
                     score = 0;
@@ -69,8 +68,7 @@ internal class GameModeStartButton_Patch_ShowGameModePrompt
         {
             if (enumerator.Current != null && enumerator.Current.opcode == match[score].opcode)
             {
-                score++;
-                if (score == match.Count)
+                if (++score == match.Count)
                 {
                     enumerator.Current.opcode = replace.opcode;
                     score = 0;

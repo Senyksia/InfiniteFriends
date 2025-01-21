@@ -6,9 +6,19 @@
 <br />**Multiplayer beyond 4 people**
 <br />A [ModWeaver](https://github.com/modweaver/modweaver) and [BepInEx 5](https://github.com/BepInEx/BepInEx) plugin for the game [SpiderHeck](https://store.steampowered.com/app/1329500/SpiderHeck)
 
-### [Installation](#installation) • [Contributing](#contributing) • [TODO](#todo) • [Changelog](#changelog)
+### [Features](#features) • [Installation](#installation) • [Contributing](#contributing) • [Changelog](#changelog)
 
 </div>
+
+
+## Features
+
+- [x] Allow more than 4 players to join a single lobby.
+- [x] Removed player count limits on all game-modes.
+- [x] Dynamic spawn point generation once the initial four are claimed.
+- [x] (Partial) Improved UI scaling.
+- [ ] Spawn a weapon next to each dynamic spawn.
+- [ ] Online support?
 
 
 ## Installation
@@ -81,14 +91,7 @@
    <br />Using Visual Studio or Rider, building will close the game and copy the compiled .dll directly into your mod folder.
 
 
-## TODO
 
-- [x] Allow more than 4 players to join a single lobby.
-- [x] Rewrite player spawning logic to scale fairly with more players.
-- [x] (Partial) Fix UI not scaling past ~6 players (Scoreboard, Customisation Menu, etc).
-- [ ] Add an option for spawning an initial weapon near each player, rather than a static 4.
-- [ ] Allow the user to set MAX_PLAYER_HARD_CAP.
-- [ ] Online?
 
 
 ## Changelog
