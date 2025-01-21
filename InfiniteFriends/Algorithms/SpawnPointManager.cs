@@ -20,27 +20,15 @@ public static class SpawnPointManager
         SpawnPointManager.WalkableConstraint.walkable = true;
     }
 
-    // TODO: Why not just raycast?
     /// <summary>
-    /// Check the distance between each default spawn point and every platform.
-    /// If no spawn points are near a platform, the level is considered airborne.
+    /// Determines if a level is airborne.
+    /// If gravity is disabled, or no default spawn points are near a platform, the level is considered airborne.
     /// </summary>
-    private static bool IsAirborneLevel(List<Collider2D> platforms)
+    private static bool IsAirborneLevel()
     {
-        if (LevelController.instance.activeLevel.zeroGravity) return true;
-
-        foreach (Transform spawn in GetDefaultSpawnPoints().ToList())
-        {
-            foreach (Collider2D platform in platforms)
-            {
-                Vector2 closest = platform.ClosestPoint(spawn.position);
-                if (Vector2.Distance(closest , spawn.position) < 50f) // 50f is the wall magnet distance
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return LevelController.instance.activeLevel.zeroGravity
+               || GetDefaultSpawnPoints()
+                   .All(t => !Physics2D.OverlapCircle(t.position, 50f, GameController.instance.worldLayers));
     }
 
     // TODO: Hopefully temporary
@@ -86,7 +74,6 @@ public static class SpawnPointManager
         return defaultSpawns;
     }
 
-    // TODO: Choose fairer locations (not next to another player)
     /// <summary>
     /// Adds new dynamic spawn points to <c>SpawnPointManager.SpawnPoints</c>.
     /// </summary>
@@ -134,7 +121,7 @@ public static class SpawnPointManager
             .ToList();
         disabled.ForEach(p => p.enabled = true);
 
-        bool isAirborne = IsAirborneLevel(platforms);
+        bool isAirborne = IsAirborneLevel();
 
         // Generate spawns
         InfiniteFriends.Logger.LogDebug($"Generating {spawnCount} spawn points. Viable platforms: {platforms.Count} | Airborne: {isAirborne}");
