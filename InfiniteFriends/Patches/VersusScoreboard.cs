@@ -12,20 +12,20 @@ internal class VersusScoreboard_Patch_Awake
     // Replace hardcoded max player values
     // Transpiles
     //    > this._versusScoreDisplay = new VersusScoreUi[4]
-    // to > this._versusScoreDisplay = new VersusScoreUi[InfiniteFriends.MAX_PLAYER_HARD_CAP]
+    // to > this._versusScoreDisplay = new VersusScoreUi[InfiniteFriends.MaxPlayerHardCap]
     //    > for (int i = 0; i < 4; i++)
-    // to > for (int i = 0; i < InfiniteFriends.MAX_PLAYER_HARD_CAP; i++)
+    // to > for (int i = 0; i < InfiniteFriends.MaxPlayerHardCap; i++)
     [HarmonyTranspiler]
     internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
         using IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
-        CodeInstruction replace = new(OpCodes.Ldc_I4, InfiniteFriends.MAX_PLAYER_HARD_CAP);
+        CodeInstruction replace = new(OpCodes.Ldc_I4, InfiniteFriends.MaxPlayerHardCap);
 
         while (enumerator.MoveNext())
         {
             if (enumerator.Current != null && enumerator.Current.opcode == OpCodes.Ldc_I4_4)
             {
-                yield return replace; // ldc.i4.4 -> ldc.i4 (InfiniteFriends.MAX_PLAYER_HARD_CAP)
+                yield return replace; // ldc.i4.4 -> ldc.i4 (InfiniteFriends.MaxPlayerHardCap)
             }
             else
             {
@@ -54,20 +54,20 @@ internal class VersusScoreboard_Patch_Update
 {
     // Transpiles
     //    > for (int j = this._playerScores.Count; j < 4; j++)
-    // to > for (int j = this._playerScores.Count; j < InfiniteFriends.MAX_PLAYER_HARD_CAP; j++)
+    // to > for (int j = this._playerScores.Count; j < InfiniteFriends.MaxPlayerHardCap; j++)
     //    > for (int k = 0; k < 4; k++)
-    // to > for (int k = 0; k < InfiniteFriends.MAX_PLAYER_HARD_CAP; k++)
+    // to > for (int k = 0; k < InfiniteFriends.MaxPlayerHardCap; k++)
     [HarmonyTranspiler]
     internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
         using IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
-        CodeInstruction replace = new(OpCodes.Ldc_I4, InfiniteFriends.MAX_PLAYER_HARD_CAP);
+        CodeInstruction replace = new(OpCodes.Ldc_I4, InfiniteFriends.MaxPlayerHardCap);
 
         while (enumerator.MoveNext())
         {
             if (enumerator.Current != null && enumerator.Current.opcode == OpCodes.Ldc_I4_4)
             {
-                yield return replace; // ldc.i4.4 -> ldc.i4 (InfiniteFriends.MAX_PLAYER_HARD_CAP)
+                yield return replace; // ldc.i4.4 -> ldc.i4 (InfiniteFriends.MaxPlayerHardCap)
             }
             else
             {

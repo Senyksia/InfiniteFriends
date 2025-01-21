@@ -7,7 +7,7 @@ using Object = UnityEngine.Object;
 
 namespace InfiniteFriends.Algorithms;
 
-public static class SpawnPointManager
+internal static class SpawnPointManager
 {
     public static List<Transform> SpawnPoints = new Transform[4].ToList();
     public static GameLevel LastLevel;
@@ -16,8 +16,8 @@ public static class SpawnPointManager
 
     static SpawnPointManager()
     {
-        SpawnPointManager.WalkableConstraint.constrainWalkability = true;
-        SpawnPointManager.WalkableConstraint.walkable = true;
+        WalkableConstraint.constrainWalkability = true;
+        WalkableConstraint.walkable = true;
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public static class SpawnPointManager
         return ret;
     }
 
-    // TODO: Detect if an unobstructed deathzone is below on airborne-gravity maps
+    // TODO: Detect if an unobstructed death-zone is below on airborne-gravity maps
     private static bool IsLegalSpawn(Vector3 pos)
     {
         Collider2D suffocate = Physics2D.OverlapCircle(pos, 0.02f, GameController.instance.worldLayers);
@@ -80,9 +80,9 @@ public static class SpawnPointManager
     /// <param name="spawnCount">Number of spawn points to generate</param>
     public static void GenerateSpawnPoints(int spawnCount)
     {
-        if (spawnCount < 1 || SpawnPointManager.SpawnPoints[0] == null) return;
+        if (spawnCount < 1 || SpawnPoints[0] == null) return;
         Transform[] defaultSpawns = GetDefaultSpawnPoints();
-        SpawnPointManager._minDist = 100f;
+        _minDist = 100f;
 
         // Keep spawns relatively close together, particularly on
         // very large maps with dense default spawns (E.g. Lobby)
@@ -125,7 +125,7 @@ public static class SpawnPointManager
 
         // Generate spawns
         InfiniteFriends.Logger.LogDebug($"Generating {spawnCount} spawn points. Viable platforms: {platforms.Count} | Airborne: {isAirborne}");
-        int prevCount = SpawnPointManager.SpawnPoints.Count;
+        int prevCount = SpawnPoints.Count;
         for (int i = 0; i < spawnCount; i++)
         {
             // Initialise a new spawn point
@@ -134,10 +134,10 @@ public static class SpawnPointManager
 
             do
             {
-                int atmpt = 0;
+                int attempt = 0;
                 do
                 {
-                    if (atmpt++ >= 100)
+                    if (attempt++ >= 100)
                     {
                         InfiniteFriends.Logger.LogWarning("Failed to generate valid spawn point after maximum attempts. Something has gone very wrong!");
                         goto Finalize; // ew
@@ -145,8 +145,8 @@ public static class SpawnPointManager
 
                     // Choose a random point within level bounds
                     spawn.position = new Vector2(
-                        UnityEngine.Random.Range(spawnBounds.min.x, spawnBounds.max.x),
-                        UnityEngine.Random.Range(spawnBounds.min.y, spawnBounds.max.y)
+                        Random.Range(spawnBounds.min.x, spawnBounds.max.x),
+                        Random.Range(spawnBounds.min.y, spawnBounds.max.y)
                     );
                 } while (!(IsLegalSpawn(spawn.position) && PathExists(spawn.position)));
 
@@ -166,7 +166,7 @@ public static class SpawnPointManager
 
             Finalize:
             InfiniteFriends.Logger.LogDebug($"Adding spawn point {spawn.name}: {spawn.position}");
-            SpawnPointManager.SpawnPoints.Add(spawn);
+            SpawnPoints.Add(spawn);
         }
 
         disabled.ForEach(p => p.enabled = false);

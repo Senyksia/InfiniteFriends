@@ -14,11 +14,6 @@ public class ScalingGridLayoutGroup : LayoutGroup
     public float aspectRatio = 1f;
     public Vector3 defaultScale = Vector3.one;
 
-    public override void CalculateLayoutInputHorizontal()
-    {
-        base.CalculateLayoutInputHorizontal();
-    }
-
     public override void CalculateLayoutInputVertical() { }
     public override void SetLayoutHorizontal() => this.SetCells();
     public override void SetLayoutVertical() { }
@@ -75,7 +70,7 @@ internal class CustomizationMenu_Patch_Start
         grid.defaultScale = panels[0].transform.localScale;
 
         // Extend the number of customization panels
-        while (panels.Count < InfiniteFriends.MAX_PLAYER_HARD_CAP)
+        while (panels.Count < InfiniteFriends.MaxPlayerHardCap)
         {
             // Generate panel
             CustomizationPanel panel = Object.Instantiate(___customizationPanels[0], ___customizationPanels[0].transform.parent);
@@ -91,8 +86,8 @@ internal class CustomizationMenu_Patch_Start
         for (int i = 0; i < panels.Count; i++)
         {
             Material material = panels[i].transform.Find("RenderTexturePreview").GetComponent<Image>().material;
-            material.mainTextureOffset = new Vector2(i/(float)InfiniteFriends.MAX_PLAYER_HARD_CAP, 0f);
-            material.mainTextureScale = new Vector2(1f/(float)InfiniteFriends.MAX_PLAYER_HARD_CAP, 1f);
+            material.mainTextureOffset = new Vector2(i/(float)InfiniteFriends.MaxPlayerHardCap, 0f);
+            material.mainTextureScale  = new Vector2(1f/      InfiniteFriends.MaxPlayerHardCap, 1f);
         }
 
         ___customizationPanels = panels.ToArray();

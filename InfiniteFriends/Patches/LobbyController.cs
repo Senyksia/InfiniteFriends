@@ -14,7 +14,7 @@ internal class LobbyController_Patch_Ctor
 {
     // Transpiles
     //    > private PlayerController[] _playerIndexes = new PlayerController[4]
-    // to > private PlayerController[] _playerIndexes = new PlayerController[InfiniteFriends.MAX_PLAYER_HARD_CAP];
+    // to > private PlayerController[] _playerIndexes = new PlayerController[InfiniteFriends.MaxPlayerHardCap];
     [HarmonyTranspiler]
     internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
@@ -31,7 +31,7 @@ internal class LobbyController_Patch_Ctor
         // Backtrack to the correct instruction
         if (i != array.Length-1)
         {
-            array[i-2] = new CodeInstruction(OpCodes.Ldc_I4, InfiniteFriends.MAX_PLAYER_HARD_CAP); // ldc.i4.4 -> ldc.i4 (InfiniteFriends.MAX_PLAYER_HARD_CAP)
+            array[i-2] = new CodeInstruction(OpCodes.Ldc_I4, InfiniteFriends.MaxPlayerHardCap); // ldc.i4.4 -> ldc.i4 (InfiniteFriends.MaxPlayerHardCap)
         }
 
         return array.AsEnumerable();
@@ -74,14 +74,14 @@ internal class LobbyController_Patch_OnPlayerJoined
     }
 }
 
-// Intercept maxPlayers and reassign to InfiniteFriends.MAX_PLAYER_HARD_CAP
+// Intercept maxPlayers and reassign to InfiniteFriends.MaxPlayerHardCap
 [HarmonyPatch(typeof(LobbyController), nameof(LobbyController.SetMaxPlayer))]
 internal class LobbyController_Patch_SetMaxPlayer
 {
     [HarmonyPrefix]
     internal static bool Prefix(ref int maxPlayers)
     {
-        maxPlayers = InfiniteFriends.MAX_PLAYER_HARD_CAP;
+        maxPlayers = InfiniteFriends.MaxPlayerHardCap;
         return true;
     }
 }
@@ -93,6 +93,6 @@ internal class LobbyController_Patch_Start
     [HarmonyPostfix]
     internal static void Postfix(ref LobbyController __instance)
     {
-        __instance.SetMaxPlayer(InfiniteFriends.MAX_PLAYER_HARD_CAP);
+        __instance.SetMaxPlayer(InfiniteFriends.MaxPlayerHardCap);
     }
 }

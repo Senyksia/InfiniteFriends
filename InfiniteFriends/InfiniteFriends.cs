@@ -11,7 +11,7 @@ namespace InfiniteFriends;
 
 internal partial class InfiniteFriends
 {
-     public const int MAX_PLAYER_HARD_CAP = 32;
+     public const int MaxPlayerHardCap = 32;
 
      public static InfiniteFriends Instance;
      internal new static ILogger Logger { get; private set; }
@@ -35,14 +35,14 @@ internal partial class InfiniteFriends
 }
 
 #if BEPINEX
-[BepInPlugin(Metadata.PLUGIN_GUID, Metadata.PLUGIN_NAME, Metadata.PLUGIN_VERSION)]
+[BepInPlugin(Metadata.PluginGuid, Metadata.PluginName, Metadata.PluginVersion)]
 [BepInProcess("SpiderHeckApp.exe")]
 internal partial class InfiniteFriends : BaseUnityPlugin
 {
     protected void Awake()
     {
-        InfiniteFriends.Logger = new BepInExLogger(BepInEx.Logging.Logger.CreateLogSource(Metadata.PLUGIN_NAME_SHORT));
-        InfiniteFriends.HarmonyPatch(Metadata.PLUGIN_GUID);
+        InfiniteFriends.Logger = new BepInExLogger(BepInEx.Logging.Logger.CreateLogSource(Metadata.PluginNameShort));
+        InfiniteFriends.HarmonyPatch(Metadata.PluginGuid);
     }
 }
 #elif MODWEAVER

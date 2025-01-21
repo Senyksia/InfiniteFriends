@@ -2,13 +2,13 @@
   <PropertyGroup>
     <RootNamespace>InfiniteFriends</RootNamespace>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>13.0</LangVersion>
+    <Platforms>AnyCPU</Platforms>
     <DebugType>portable</DebugType>
+    <Configurations>BepInEx-Debug;ModWeaver-Debug;BepInEx-Release;ModWeaver-Release</Configurations>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
-    <Configurations>BepInEx-Debug;ModWeaver-Debug;BepInEx-Release;ModWeaver-Release</Configurations>
-    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Contains('Debug'))">

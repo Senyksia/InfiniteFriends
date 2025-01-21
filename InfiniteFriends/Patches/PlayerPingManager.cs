@@ -14,8 +14,7 @@ internal class PlayerPingManager_Patch_Instantiate
         // Append the list with clones as necessary
         while (___playerContainers.Count < ___lobbyController.spawnedPlayers.Count)
         {
-            PlayerPingContainer container = Object.Instantiate(___playerContainers[0]);
-            container.transform.SetParent(___playerContainers[0].transform.parent, false);
+            PlayerPingContainer container = Object.Instantiate(___playerContainers[0], ___playerContainers[0].transform.parent, false);
             ___playerContainers.Add(container);
         }
 
