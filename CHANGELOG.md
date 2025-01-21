@@ -3,10 +3,14 @@
 Based on [Keep a Changelog](https://keepachangelog.com)!
 
 ## [Unreleased]
+
+## [0.3.1] - 2025-01-21
+
 ### Fixed
-- Gamemode buttons not activating with more than one player in the lobby.
-  This feature was broken by a game update at some point, but should now be fixed.
-- Players spawning past the starting point on parkour maps.
+
+-   Gamemode buttons not activating with more than one player in the lobby.
+    This feature was broken by a game update at some point, but should now be fixed.
+-   Players spawning past the starting point on parkour maps.
 
 ## [0.3.0] - 2025-01-20
 
@@ -66,7 +70,9 @@ Based on [Keep a Changelog](https://keepachangelog.com)!
 -   Patched the local multiplayer to remove the player limit of four. Online is currently untested, and may or may not work.
 -   Extended the default spawn locations with some basic logic.
 
-[Unreleased]: https://github.com/Senyksia/InfiniteFriends/compare/0.3.0...HEAD
+[Unreleased]: https://github.com/Senyksia/InfiniteFriends/compare/0.3.1...HEAD
+
+[0.3.1]: https://github.com/Senyksia/InfiniteFriends/compare/0.3.0...0.3.1
 
 [0.3.0]: https://github.com/Senyksia/InfiniteFriends/compare/0.2.1...0.3.0
 
