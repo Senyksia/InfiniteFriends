@@ -37,11 +37,11 @@
 
 > [!TIP]
 > ModWeaver is the standard mod-loader for SpiderHeck, and is what you will probably need when using other mods.
-> <br />If you're unsure which to install, go with ModWeaver. BepInEx 5 support is provided as an alternative/fallback.
+> <br />If you're unsure which to install, go with ModWeaver. BepInEx 5 support is provided as an alternative or fallback.
 
 > [!IMPORTANT]
-> The [1.1.0 release](https://github.com/modweaver/modweaver/releases/tag/1.1.0) of **ModWeaver** is non-functional at time of writing; instead the [latest build](https://github.com/modweaver/modweaver/actions/runs/10702095842/artifacts/1891040653) should be installed,
-> until a new ModWeaver release is officially published.
+> The [1.1.0 release](https://github.com/modweaver/modweaver/releases/tag/1.1.0) of **ModWeaver** is non-functional at time of writing;
+> Until a new release is published, BepInEx should be installed instead.
 2. **Install ModWeaver or BepInEx**
 
     - **ModWeaver**
